@@ -13,13 +13,18 @@ function getGame(team){return gameData.find(g=>g.competitors.some(c=>match(team,
 function outcome(team){const g=getGame(team);if(!g)return {status:'off'};const c=g.competitors.find(c=>match(team,c));const state=g.state;if(state==='post')return {status:c.winner?'win':'loss',g,c};if(state==='in')return {status:'live',g,c};return {status:'upcoming',g,c}}
 function totals(name){const states=rosters[name].map(outcome);return {name,w:states.filter(s=>s.status==='win').length,l:states.filter(s=>s.status==='loss').length,live:states.filter(s=>s.status==='live').length,left:states.filter(s=>s.status==='upcoming').length,off:states.filter(s=>s.status==='off').length}}
 function renderTicker(){
- const alerts=[];
+ const live=gameData.filter(g=>g.state==='in'&&g.competitors.length===2&&g.competitors.some(ownerForCompetitor));
+ const earliest=live.length?Math.min(...live.map(g=>Date.parse(g.date)).filter(Number.isFinite)):Infinity;
+ const earlyWave=live.filter(g=>Date.parse(g.date)<=earliest+60*60*1000);
+ const earlyProgress=earlyWave.length?earlyWave.filter(g=>Number(g.period)>=3).length/earlyWave.length:1;
+ const mode=earlyProgress<.5?'early':earlyProgress<.85?'mid':'late';
+ const alerts=[],fallback=[];
  for(const g of gameData){
   if(g.state==='pre'||g.competitors.length!==2)continue;
   const [a,b]=g.competitors,sa=Number(a.score),sb=Number(b.score);
   if(!Number.isFinite(sa)||!Number.isFinite(sb))continue;
-  const owners=g.competitors.map(ownerForCompetitor),drafted=owners.some(Boolean);
-  if(!drafted)continue;
+  const owners=g.competitors.map(ownerForCompetitor);
+  if(!owners.some(Boolean))continue;
   const margin=Math.abs(sa-sb),period=Number(g.period)||0,detail=g.detail||'';
   const overtime=period>=5||/\bOT\b|overtime/i.test(detail);
   const clock=g.clock||detail.match(/(\d+):(\d+)/)?.[0]||'';
@@ -28,21 +33,26 @@ function renderTicker(){
   const top15=ranked.findIndex((rank,i)=>rank>=1&&rank<=15&&(ranked[1-i]===0||ranked[1-i]>rank));
   const underdog=top15===0?1:top15===1?0:-1;
   const upset=underdog>=0&&(underdog===0?sa>sb:sb>sa);
-  const majorUpset=upset&&(g.state==='post'||period>=3||overtime);
-  const lateClose=g.state==='in'&&(overtime||(period===3&&margin<=3)||(period===4&&(margin<=8||(seconds<=300&&margin<=10))));
-  if(!majorUpset&&!lateClose)continue;
+  const majorUpset=upset&&(g.state==='post'||period>=3||overtime||(mode==='early'&&period>=1));
+  const threshold=mode==='early'?(period===1?7:period===2?10:period===3?7:10):mode==='mid'?(period===3?7:period===4?10:0):(period===4?8:0);
+  const close=g.state==='in'&&(overtime||margin<=threshold&&threshold>0||period===4&&seconds<=300&&margin<=10);
   const name=c=>displayTeamName(c.team?.shortDisplayName||c.team?.displayName||'Team');
   const labeled=c=>'<span class="ticker-team">'+name(c)+(ownerForCompetitor(c)?'<span class="ticker-owner">'+ownerForCompetitor(c)+'</span>':'')+'</span>';
   const matchup='<span class="ticker-match">'+labeled(a)+'<span class="ticker-score">'+sa+'–'+sb+'</span>'+labeled(b)+'</span>';
   const status='<span class="ticker-status">'+(detail||(g.state==='post'?'Final':'Live'))+'</span>';
   const headToHead=owners[0]&&owners[1]&&owners[0]!==owners[1];
-  const priority=(majorUpset?150:100)+(overtime?55:period===4?35:period===3?15:0)+(headToHead?20:0)+(g.state==='post'?5:0)+(lateClose?Math.max(0,12-margin):0);
-  alerts.push({priority,label:majorUpset?(g.state==='post'?'UPSET FINAL':'UPSET ALERT'):(overtime?'OVERTIME':'CLOSE GAME'),message:matchup+status});
+  const priority=(majorUpset?180:close?110:20)+(overtime?65:period===4?40:period===3?22:period===2?10:0)+(headToHead?25:0)+Math.max(0,20-margin)+(g.state==='post'?4:0);
+  const item={priority,label:majorUpset?(g.state==='post'?'UPSET FINAL':'UPSET ALERT'):(overtime?'OVERTIME':close?'CLOSE GAME':'LIVE GAME'),message:matchup+status};
+  if(majorUpset||close)alerts.push(item);
+  else if(g.state==='in')fallback.push(item);
  }
  alerts.sort((a,b)=>b.priority-a.priority);
+ fallback.sort((a,b)=>b.priority-a.priority);
+ const top=alerts.slice(0,5);
+ if(live.length>=3&&top.length<3)top.push(...fallback.slice(0,Math.min(3-top.length,5-top.length)));
  const win=document.getElementById('ticker-window');
- if(!alerts.length){win.innerHTML='<div class="ticker-empty">No major upsets or late close games right now. Watching for the next big moment.</div>';return}
- const top=alerts.slice(0,5),items=top.map(a=>'<span class="ticker-item"><strong>'+a.label+'</strong>'+a.message+'</span>').join('');
+ if(!top.length){win.innerHTML='<div class="ticker-empty">Watching for close games and big upsets.</div>';return}
+ const items=top.map(a=>'<span class="ticker-item"><strong>'+a.label+'</strong>'+a.message+'</span>').join('');
  win.innerHTML='<div class="ticker-track">'+items+items+'</div>';
  win.firstElementChild.style.animationDuration=Math.max(25,top.length*8)+'s';
 }
