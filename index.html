@@ -151,9 +151,11 @@ function renderSuperlatives(){
  const byOwner=Object.keys(rosters).map(name=>{
   const wins=games.filter(x=>x.winOwner===name);
   const losses=finished.filter(x=>x.loseOwner===name);
-  const pregame=rosters[name].map(team=>{const o=outcome(team);return o.g&&o.g.state==='post'&&o.g.spread!==null&&o.g.favoriteId?{team,g:o.g}:null}).filter(Boolean);
-  const expected=pregame.filter(x=>{const c=x.g.competitors.find(c=>match(x.team,c));return c&&String(c.id)===String(x.g.favoriteId)}).length;
-  const actual=pregame.filter(x=>outcome(x.team).status==='win').length;
+  // Use the same finished-game records and resolved owners as Biggest Upset.
+  // This avoids requiring a second team-name lookup for the odds award.
+  const pregame=finished.filter(x=>x.favoriteId!=null&&x.spread!=null&&Number.isFinite(x.spread)&&(x.winOwner===name||x.loseOwner===name));
+  const expected=pregame.filter(x=>(x.winOwner===name&&String(x.winner.id)===String(x.favoriteId))||(x.loseOwner===name&&String(x.loser.id)===String(x.favoriteId))).length;
+  const actual=pregame.filter(x=>x.winOwner===name).length;
   return {name,wins,losses,pregame:pregame.length,expected,actual,delta:actual-expected,cardiac:wins.filter(x=>x.margin<=7).length,heartbreak:losses.filter(x=>x.margin<=3).length,h2h:wins.filter(x=>x.loseOwner&&x.loseOwner!==name).length,h2hLosses:losses.filter(x=>x.winOwner&&x.winOwner!==name).length};
  });
  const beat=pick(byOwner.filter(x=>x.pregame.length>0),(a,b)=>b.delta-a.delta||b.pregame.length-a.pregame.length);
