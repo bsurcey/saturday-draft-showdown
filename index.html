@@ -158,7 +158,7 @@ function renderSuperlatives(){
   const actual=pregame.filter(x=>x.winOwner===name).length;
   return {name,wins,losses,pregame:pregame.length,expected,actual,delta:actual-expected,cardiac:wins.filter(x=>x.margin<=7).length,heartbreak:losses.filter(x=>x.margin<=3).length,h2h:wins.filter(x=>x.loseOwner&&x.loseOwner!==name).length,h2hLosses:losses.filter(x=>x.winOwner&&x.winOwner!==name).length};
  });
- const beat=pick(byOwner.filter(x=>x.pregame.length>0),(a,b)=>b.delta-a.delta||b.pregame.length-a.pregame.length);
+ const beat=pick(byOwner.filter(x=>x.pregame>0),(a,b)=>b.delta-a.delta||b.pregame-a.pregame);
  const heartbreak=pick(byOwner.filter(x=>x.heartbreak>0),(a,b)=>b.heartbreak-a.heartbreak);
  const cardiac=pick(byOwner.filter(x=>x.cardiac>0),(a,b)=>b.cardiac-a.cardiac);
  const points=pick(games,(a,b)=>b.winScore-a.winScore);
