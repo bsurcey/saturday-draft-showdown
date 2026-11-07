@@ -176,7 +176,6 @@ function renderSuperlatives(){
   ['Biggest Upset',biggest?'+'+biggest.spread+' pts':'Awaiting odds',biggest?score(biggest)+' · '+(biggest.winOwner||'Undrafted'):'Requires a pregame spread'],
   ['Biggest Blowout',blowout?blowout.margin+' pts':'Waiting',blowout?score(blowout)+' · '+blowout.winOwner:'No completed drafted wins yet'],
   ['Closest Call',closest?closest.margin+' pt'+(closest.margin===1?'':'s'):'Waiting',closest?score(closest)+' · '+closest.winOwner:'No completed drafted wins yet'],
-  ['Beat the Odds',beat?(beat.delta>0?'+':'')+beat.delta+' wins':'Awaiting odds',beat?beat.name+' · '+beat.actual+' actual vs. '+beat.expected+' favored ('+beat.pregame.length+' games with lines)':'Requires pregame favorites'],
   ['Heartbreak Hotel',heartbreak?heartbreak.heartbreak+' '+(heartbreak.heartbreak===1?'loss':'losses'):'Waiting',heartbreak?heartbreak.name+' · losses by 3 or fewer':'No narrow losses yet'],
   ['Cardiac Kids',cardiac?cardiac.cardiac+' '+(cardiac.cardiac===1?'win':'wins'):'Waiting',cardiac?cardiac.name+' · wins by 7 or fewer':'No close wins yet'],
   ['Point Machine',points?points.winScore+' points':'Waiting',points?points.winName+' · '+points.winOwner+' · '+score(points):'No completed drafted wins yet'],
