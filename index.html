@@ -7,7 +7,7 @@ const aliases={'NC State':['north carolina state','nc state','n.c. state'],'UCF'
 let selected='Brad',gameData=[],loaded=false;
 const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 function match(team,c){const names=[c.team?.displayName,c.team?.name,c.team?.shortDisplayName,c.team?.location,c.team?.abbreviation].filter(Boolean).map(norm);return (aliases[team]||[team]).some(a=>names.includes(norm(a)))}
-function displayTeamName(name){return String(name||'').replace(/\bSt\.?\b/gi,'State').replace(/\bState\./gi,'State')}
+function displayTeamName(name){return String(name||'').replace(/\bSt\.(?=\s|$)|\bSt\b/gi,'State').replace(/\bState\./gi,'State')}
 function ownerForCompetitor(c){return Object.keys(rosters).find(owner=>rosters[owner].some(team=>match(team,c)))||null}
 function getGame(team){return gameData.find(g=>g.competitors.some(c=>match(team,c)))||null}
 function outcome(team){const g=getGame(team);if(!g)return {status:'off'};const c=g.competitors.find(c=>match(team,c));const state=g.state;if(state==='post')return {status:c.winner?'win':'loss',g,c};if(state==='in')return {status:'live',g,c};return {status:'upcoming',g,c}}
