@@ -135,7 +135,7 @@ function renderSuperlatives(){
  const byOwner=Object.keys(rosters).map(name=>{
   const wins=games.filter(x=>x.winOwner===name);
   const losses=finished.filter(x=>x.loseOwner===name);
-  const pregame=rosters[name].map(team=>{const o=outcome(team);return o.g&&o.g.spread!==null&&o.g.favoriteId?{team,g:o.g}:null}).filter(Boolean);
+  const pregame=rosters[name].map(team=>{const o=outcome(team);return o.g&&o.g.state==='post'&&o.g.spread!==null&&o.g.favoriteId?{team,g:o.g}:null}).filter(Boolean);
   const expected=pregame.filter(x=>{const c=x.g.competitors.find(c=>match(x.team,c));return c&&String(c.id)===String(x.g.favoriteId)}).length;
   const actual=pregame.filter(x=>outcome(x.team).status==='win').length;
   return {name,wins,losses,pregame:pregame.length,expected,actual,delta:actual-expected,cardiac:wins.filter(x=>x.margin<=7).length,heartbreak:losses.filter(x=>x.margin<=3).length,h2h:wins.filter(x=>x.loseOwner&&x.loseOwner!==name).length,h2hLosses:losses.filter(x=>x.winOwner&&x.winOwner!==name).length};
