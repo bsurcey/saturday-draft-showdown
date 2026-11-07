@@ -159,10 +159,10 @@ function renderSuperlatives(){
   ['Biggest Blowout',blowout?blowout.margin+' pts':'Waiting',blowout?score(blowout)+' · '+blowout.winOwner:'No completed drafted wins yet'],
   ['Closest Call',closest?closest.margin+' pt'+(closest.margin===1?'':'s'):'Waiting',closest?score(closest)+' · '+closest.winOwner:'No completed drafted wins yet'],
   ['Beat the Odds',beat?(beat.delta>0?'+':'')+beat.delta+' wins':'Awaiting odds',beat?beat.name+' · '+beat.actual+' actual vs. '+beat.expected+' favored ('+beat.pregame.length+' games with lines)':'Requires pregame favorites'],
-  ['Heartbreak Hotel',heartbreak?heartbreak.heartbreak+' losses':'Waiting',heartbreak?heartbreak.name+' · losses by 3 or fewer':'No narrow losses yet'],
-  ['Cardiac Kids',cardiac?cardiac.cardiac+' wins':'Waiting',cardiac?cardiac.name+' · wins by 7 or fewer':'No close wins yet'],
+  ['Heartbreak Hotel',heartbreak?heartbreak.heartbreak+' '+(heartbreak.heartbreak===1?'loss':'losses'):'Waiting',heartbreak?heartbreak.name+' · losses by 3 or fewer':'No narrow losses yet'],
+  ['Cardiac Kids',cardiac?cardiac.cardiac+' '+(cardiac.cardiac===1?'win':'wins'):'Waiting',cardiac?cardiac.name+' · wins by 7 or fewer':'No close wins yet'],
   ['Point Machine',points?points.winScore+' points':'Waiting',points?points.winName+' · '+points.winOwner+' · '+score(points):'No completed drafted wins yet'],
-  ['Head-to-Head King',h2h?h2h.wins+' wins':'Waiting',h2h?h2h.winner+' over '+h2h.loser+' · most wins against one owner':'No completed head-to-head games yet']
+  ['Head-to-Head King',h2h?h2h.wins+' '+(h2h.wins===1?'win':'wins'):'Waiting',h2h?h2h.winner+' over '+h2h.loser+' · most wins against one owner':'No completed head-to-head games yet']
  ];
  document.getElementById('super-grid').innerHTML=awards.map(([title,value,detail])=>'<article class="super-card"><div class="super-title">'+title+'</div><div class="super-value">'+value+'</div><div class="super-detail">'+detail+'</div></article>').join('');
 }
