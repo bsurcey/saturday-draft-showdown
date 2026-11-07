@@ -144,7 +144,15 @@ function renderSuperlatives(){
  const heartbreak=pick(byOwner.filter(x=>x.heartbreak>0),(a,b)=>b.heartbreak-a.heartbreak);
  const cardiac=pick(byOwner.filter(x=>x.cardiac>0),(a,b)=>b.cardiac-a.cardiac);
  const points=pick(games,(a,b)=>b.winScore-a.winScore);
- const h2h=pick(byOwner.filter(x=>x.h2h+x.h2hLosses>0),(a,b)=>b.h2h-a.h2h||(a.h2hLosses-b.h2hLosses));
+ const headToHeadPairs=[];
+ for(const winner of Object.keys(rosters)){
+  for(const loser of Object.keys(rosters)){
+   if(winner===loser)continue;
+   const wins=finished.filter(x=>x.winOwner===winner&&x.loseOwner===loser).length;
+   if(wins>0)headToHeadPairs.push({winner,loser,wins});
+  }
+ }
+ const h2h=pick(headToHeadPairs,(a,b)=>b.wins-a.wins||a.winner.localeCompare(b.winner)||a.loser.localeCompare(b.loser));
  const score=x=>x.winName+' '+x.winScore+'–'+x.loseScore+' '+x.loseName;
  const awards=[
   ['Biggest Upset',biggest?'+'+biggest.spread+' pts':'Awaiting odds',biggest?score(biggest)+' · '+(biggest.winOwner||'Undrafted'):'Requires a pregame spread'],
@@ -154,7 +162,7 @@ function renderSuperlatives(){
   ['Heartbreak Hotel',heartbreak?heartbreak.heartbreak+' losses':'Waiting',heartbreak?heartbreak.name+' · losses by 3 or fewer':'No narrow losses yet'],
   ['Cardiac Kids',cardiac?cardiac.cardiac+' wins':'Waiting',cardiac?cardiac.name+' · wins by 7 or fewer':'No close wins yet'],
   ['Point Machine',points?points.winScore+' points':'Waiting',points?points.winName+' · '+points.winOwner+' · '+score(points):'No completed drafted wins yet'],
-  ['Head-to-Head King',h2h?h2h.h2h+'–'+h2h.h2hLosses:'Waiting',h2h?h2h.name+' · against other owners':'No completed head-to-head games yet']
+  ['Head-to-Head King',h2h?h2h.wins+' wins':'Waiting',h2h?h2h.winner+' over '+h2h.loser+' · most wins against one owner':'No completed head-to-head games yet']
  ];
  document.getElementById('super-grid').innerHTML=awards.map(([title,value,detail])=>'<article class="super-card"><div class="super-title">'+title+'</div><div class="super-value">'+value+'</div><div class="super-detail">'+detail+'</div></article>').join('');
 }
