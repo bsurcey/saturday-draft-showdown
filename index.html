@@ -60,14 +60,22 @@ function renderChampion(){
  const banner=document.getElementById('champion-banner');
  if(!loaded){banner.style.display='none';return}
  const names=Object.keys(rosters),stats=Object.fromEntries(names.map(n=>[n,totals(n)]));
- // A winner is clinched only if their FINAL wins exceed every rival's
- // maximum possible wins, counting all live, upcoming AND unmatched picks
- // as potential wins for the rival. This never relies on live leads.
- const clinched=names.filter(n=>names.every(other=>other===n||stats[n].w>stats[other].w+stats[other].live+stats[other].left+stats[other].off));
- if(clinched.length!==1){banner.style.display='none';return}
- const name=clinched[0],t=stats[name],unfinished=t.live+t.left+t.off;
+ const remaining=n=>stats[n].live+stats[n].left+stats[n].off;
+ const allFinal=names.every(n=>remaining(n)===0);
+ const best=Math.max(...names.map(n=>stats[n].w));
+ const leaders=names.filter(n=>stats[n].w===best);
+ // An outright champion can be announced early only when no rival can catch up.
+ const outright=leaders.length===1&&names.every(n=>n===leaders[0]||stats[leaders[0]].w>stats[n].w+remaining(n));
+ if(!allFinal&&!outright){banner.style.display='none';return}
  banner.style.display='block';
- banner.innerHTML='<div class="champion-eyebrow">🏆 '+(names.every(n=>stats[n].live+stats[n].left+stats[n].off===0)?'Final champion':'Winner clinched')+'</div><div class="champion-name">'+name+' wins Fripp Island Football 26!</div><div class="champion-detail">'+t.w+' confirmed wins. No other owner can catch '+name+', even if they win every remaining game.</div>';
+ if(leaders.length>1){
+  const list=leaders.length===2?leaders.join(' and '):leaders.slice(0,-1).join(', ')+', and '+leaders[leaders.length-1];
+  const count=leaders.length===2?'Two owners':leaders.length===3?'Three owners':leaders.length+' owners';
+  banner.innerHTML='<div class="champion-eyebrow">🏆 '+(leaders.length===2?'CO-CHAMPIONS!':leaders.length===3?'THREE-WAY TIE FOR THE CROWN!':'SHARED CHAMPIONSHIP!')+'</div><div class="champion-name">'+list+' share the Fripp Island Football 26 championship!</div><div class="champion-detail">'+best+' wins each. '+count+'. One crown.</div>';
+  return;
+ }
+ const name=leaders[0],t=stats[name];
+ banner.innerHTML='<div class="champion-eyebrow">🏆 '+(allFinal?'Final champion':'Winner clinched')+'</div><div class="champion-name">'+name+' wins Fripp Island Football 26!</div><div class="champion-detail">'+t.w+' confirmed wins. '+(allFinal?'The final standings are in.':'No other owner can catch '+name+', even if they win every remaining game.')+'</div>';
 }
 function nameOrder(name){return Object.keys(rosters).indexOf(name)}
 // Archived consensus closing lines from BetSharp (completed games), with
