@@ -1,6 +1,6 @@
 export default async (request) => {
   const url = new URL(request.url);
-  const date = /^\d{8}$/.test(url.searchParams.get('date') || '') ? url.searchParams.get('date') : '20261107';
+  const date = /^\d{8}$/.test(url.searchParams.get('date') || '') ? url.searchParams.get('date') : '20261121';
   const endpoint = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date}&limit=500&groups=80`;
   try {
     const response = await fetch(endpoint, { headers: { 'Accept': 'application/json' } });
