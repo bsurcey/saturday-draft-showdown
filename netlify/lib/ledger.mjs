@@ -1,4 +1,4 @@
-export const players = ['Brad', 'Jeff', 'Jason', 'Lay', 'Craig', 'Herb', 'Todd'];
+export const players = ['Brad', 'Jeff', 'Jason', 'Lay', 'Craig', 'Herb', 'Todd', 'Dave'];
 export const stake = 20;
 
 const calendar = new Intl.DateTimeFormat('en-CA', {
