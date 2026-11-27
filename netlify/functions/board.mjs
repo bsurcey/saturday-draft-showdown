@@ -3,7 +3,7 @@ import { devicePlayer, deviceToken, openDevices } from '../lib/device.mjs';
 import { alignGame, dayOf, gameView, players, result, shiftDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
 import { featured, leagues, scoreboard, summary } from '../lib/espn.mjs';
 
-const key = 'games-v1';
+const key = 'games-v2';
 const isGameId = /^(ncaaf|ncaam|nfl):\d{1,15}$/;
 const json = (value, status = 200) => Response.json(value, {
   status, headers: { 'Cache-Control': 'no-store' },
