@@ -181,6 +181,48 @@ function renderGames() {
       : '<p class="empty">No matchups on this board yet.</p>');
 }
 
+function settlementPlan(standings) {
+  const debtors = standings.filter(row => row.settled < 0)
+    .map(row => ({ name: row.name, remaining: -row.settled }))
+    .sort((a, b) => b.remaining - a.remaining || a.name.localeCompare(b.name));
+  const creditors = standings.filter(row => row.settled > 0)
+    .map(row => ({ name: row.name, remaining: row.settled }))
+    .sort((a, b) => b.remaining - a.remaining || a.name.localeCompare(b.name));
+  let best;
+
+  function search(transfers) {
+    if (best && transfers.length >= best.length) return;
+    const debtor = debtors.find(item => item.remaining > 0);
+    if (!debtor) {
+      best = transfers;
+      return;
+    }
+    const triedAmounts = new Set();
+    for (const creditor of creditors) {
+      if (!creditor.remaining || triedAmounts.has(creditor.remaining)) continue;
+      triedAmounts.add(creditor.remaining);
+      const amount = Math.min(debtor.remaining, creditor.remaining);
+      debtor.remaining -= amount;
+      creditor.remaining -= amount;
+      search([...transfers, { from: debtor.name, to: creditor.name, amount }]);
+      debtor.remaining += amount;
+      creditor.remaining += amount;
+    }
+  }
+
+  search([]);
+  return best ?? [];
+}
+
+function renderSettlements() {
+  const plan = settlementPlan(board.standings);
+  $('settlements').innerHTML = plan.length
+    ? '<ol class="settlement-list">' + plan.map(payment => '<li><span><strong>' + text(payment.from)
+      + '</strong> pays <strong>' + text(payment.to) + '</strong></span><strong class="points">$'
+      + payment.amount + '</strong></li>').join('') + '</ol>'
+    : '<p class="empty">No payments needed. Everyone is even.</p>';
+}
+
 function render({ force = false } = {}) {
   refreshStatus();
   if (!board) return;
@@ -202,6 +244,7 @@ function render({ force = false } = {}) {
 
   renderBalances();
   renderGames();
+  renderSettlements();
   $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th><th scope="col">Owed net</th>'
     + '<th scope="col">Live net</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
     + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signedMoney(row.settled)

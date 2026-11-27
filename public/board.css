@@ -59,7 +59,7 @@ h1 { font-size: clamp(2rem, 6vw, 3.15rem); line-height: 1.05; letter-spacing: -.
 .ledger-title, h2 { font-size: clamp(1.6rem, 4vw, 2.15rem); letter-spacing: -.035em; }
 .overview p { margin-top: 7px; color: var(--muted); }
 .week-selector { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .875rem; white-space: nowrap; }
-.balance-panel, .standings, .game { background: var(--white); border: 1px solid var(--border); border-radius: 9px; }
+.balance-panel, .standings, .settlement, .game { background: var(--white); border: 1px solid var(--border); border-radius: 9px; }
 .panel-toolbar, .filters { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .panel-toolbar { padding: 12px 15px; border-bottom: 1px solid var(--border); }
 .segments { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -117,6 +117,12 @@ button.team:enabled:hover { border-color: #aa5209; }
 .rank-table { border-collapse: collapse; width: 100%; font-size: .925rem; }
 .rank-table th, .rank-table td { text-align: left; padding: 10px 16px; border-top: 1px solid var(--border); }
 .rank-table thead th { color: var(--muted); font-weight: 650; }
+.settlement { margin-top: 24px; }
+.settlement-head { padding: 15px 17px 12px; }
+.settlement-head p { margin-top: 4px; color: var(--muted); font-size: .85rem; }
+.settlement-list { margin: 0; padding: 0; list-style: none; }
+.settlement-list li { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 13px 17px; border-top: 1px solid var(--border); }
+.settlement-list .points { white-space: nowrap; }
 footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 2px 0 25px; color: var(--muted); font-size: .8rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 850px) { .game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
