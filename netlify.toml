@@ -1,8 +1,13 @@
 [build]
-  publish = "."
+  publish = "public"
   functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/scores"
   to = "/.netlify/functions/scores"
+  status = 200
+
+[[redirects]]
+  from = "/api/board"
+  to = "/.netlify/functions/board"
   status = 200

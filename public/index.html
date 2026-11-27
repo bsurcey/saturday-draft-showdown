@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1a1d20">
+  <meta name="description" content="The Fripp crew’s weekend picks and head-to-head points.">
+  <title>Fripp Island Pick Board</title>
+  <link rel="stylesheet" href="/board.css">
+  <script type="module" src="/board.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="Fripp Island Pick Board home">
+        <span class="monogram" aria-hidden="true">FI</span>
+        <span>FRIPP ISLAND<small>PICK BOARD</small></span>
+      </a>
+      <label class="identity" for="player">Playing as
+        <select id="player">
+          <option value="">Choose your name</option>
+          <option>Brad</option><option>Jeff</option><option>Jason</option><option>Lay</option>
+          <option>Craig</option><option>Herb</option><option>Todd</option>
+        </select>
+      </label>
+    </div>
+  </header>
+  <main>
+    <div class="overview">
+      <div>
+        <h1>Who owes whom</h1>
+        <p id="week-label">Loading this week…</p>
+      </div>
+      <label class="week-selector" for="week">
+        <span>Week</span>
+        <select id="week" disabled><option value="">This week</option></select>
+      </label>
+    </div>
+
+    <p id="notice" role="status" hidden></p>
+    <section class="balance-panel" aria-label="Head-to-head balances">
+      <div class="panel-toolbar">
+        <div class="segments" aria-label="Balance view">
+          <button type="button" data-scope="mine" aria-pressed="true">My balances</button>
+          <button type="button" data-scope="group" aria-pressed="false">Group balances</button>
+        </div>
+        <span class="refresh-label" id="refresh-label">Connecting</span>
+      </div>
+      <div id="balances" aria-busy="true"><p class="empty">Loading balances…</p></div>
+    </section>
+
+    <section class="matchups" aria-labelledby="matchups-heading">
+      <div class="overview">
+        <div>
+          <h2 id="matchups-heading">Pick your sides</h2>
+          <p>20 points per opponent on the other side.</p>
+        </div>
+      </div>
+      <div class="filters">
+        <div class="segments" aria-label="Sport">
+          <button type="button" data-league="all" aria-pressed="true">All games</button>
+          <button type="button" data-league="ncaaf" aria-pressed="false">College football</button>
+          <button type="button" data-league="ncaam" aria-pressed="false">College basketball</button>
+          <button type="button" data-league="nfl" aria-pressed="false">NFL</button>
+        </div>
+        <label for="game-day">
+          <span class="sr-only">Game day</span>
+          <select id="game-day"><option value="all">All days</option></select>
+        </label>
+      </div>
+      <div id="games" aria-busy="true"><p class="empty">Loading the matchup board…</p></div>
+    </section>
+
+    <details class="standings" id="standings">
+      <summary>Overall leaderboard</summary>
+      <div id="ranks"></div>
+    </details>
+  </main>
+  <footer>
+    <a href="/draft-archive.html">Original Fripp football tracker</a>
+    <span>Scores and spreads via ESPN</span>
+  </footer>
+</body>
+</html>
