@@ -16,7 +16,7 @@
   <meta property="og:image:alt" content="Black-and-white illustration of a bearded man wearing glasses">
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="stylesheet" href="/board.css?v=15">
+  <link rel="stylesheet" href="/board.css?v=16">
   <link rel="stylesheet" href="/statement.css?v=1">
   <link rel="stylesheet" href="/gameday.css?v=1">
   <script>
@@ -29,11 +29,11 @@
       document.documentElement.classList.add('invest-view');
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = '/invest.css?v=4';
+      stylesheet.href = '/invest.css?v=5';
       document.head.append(stylesheet);
     }
   </script>
-  <script type="module" src="/board.js?v=12"></script>
+  <script type="module" src="/board.js?v=13"></script>
 </head>
 <body>
   <header class="masthead">
@@ -71,7 +71,7 @@
         <h1 id="statement-title">Your balance</h1>
         <p class="statement-value" id="statement-settled">…</p>
         <p class="statement-caption">From completed games</p>
-        <p class="statement-live"><strong id="statement-live">…</strong> if games ended now</p>
+        <p class="statement-live"><strong id="statement-live">…</strong> <span class="statement-live-caption">if games ended now</span><span class="invest-live-caption">Live net</span></p>
       </div>
       <figure class="statement-trend" id="statement-trend" hidden>
         <figcaption id="statement-chart-caption">Settled balance by game date</figcaption>

@@ -31,6 +31,28 @@
 .invest-view .statement-classic { display: inline; }
 .invest-view :focus-visible { outline-color: var(--bright); }
 
+.invest-view .statement-summary {
+  border-bottom: 1px solid #35322d;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+.invest-view #statement-title {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.invest-view .statement-value {
+  margin-top: 6px;
+  font-size: clamp(3rem, 8vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+.invest-view .statement-value.neutral { color: var(--ink); }
+.invest-view .statement-caption, .invest-view .statement-live-caption { display: none; }
+.invest-view .invest-live-caption { display: inline; }
+.invest-view .statement-live { margin-top: 8px; }
+
 .invest-view .ledger-title,
 .invest-view h2,
 .invest-view .player-dialog h1 {

@@ -7,6 +7,7 @@ const weekInput = $('week');
 const historyBalances = $('history-balances');
 const dayInput = $('game-day');
 const statementView = document.documentElement.classList.contains('statement-view');
+const investView = document.documentElement.classList.contains('invest-view');
 const statementChart = $('statement-chart');
 const time = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit',
@@ -304,15 +305,17 @@ function drawStatementChart() {
   context.fill();
 }
 
-function renderStatement() {
+function renderBalanceSummary() {
   const row = board.standings.find(item => item.name === player);
   if (!row) return;
   $('statement-summary').hidden = false;
-  for (const [id, value] of [['statement-settled', row.settled], ['statement-live', row.live]]) {
-    const amount = $(id);
-    amount.textContent = signedMoney(value);
-    amount.className = 'points ' + pointClass(value) + (id === 'statement-settled' ? ' statement-value' : '');
-  }
+  const settled = $('statement-settled');
+  settled.textContent = signedMoney(row.settled);
+  settled.className = 'statement-value points ' + pointClass(row.settled);
+  const live = $('statement-live');
+  live.textContent = signedMoney(row.live);
+  live.className = 'points ' + pointClass(row.live);
+  if (!statementView) return;
   const trend = row.trend ?? [];
   $('statement-trend').hidden = !trend.length;
   if (!trend.length) return;
@@ -330,7 +333,7 @@ function render({ force = false } = {}) {
   refreshStatus();
   if (!board) return;
   const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs,
-    statementView ? board.standings : null, saving]);
+    statementView || investView ? board.standings : null, saving]);
   if (!force && signature === lastRender) return;
   lastRender = signature;
 
@@ -345,7 +348,7 @@ function render({ force = false } = {}) {
   renderBalances();
   renderGames();
   renderSettlements();
-  if (statementView) renderStatement();
+  if (statementView || investView) renderBalanceSummary();
   $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th><th scope="col">Owed net</th>'
     + '<th scope="col">Live net</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
     + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signedMoney(row.settled)
