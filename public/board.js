@@ -122,6 +122,17 @@ function opponentCount(picks, name) {
   return Object.values(picks).filter(pick => pick === opposite).length;
 }
 
+function hasOpposingPicks(picks) {
+  const sides = new Set(Object.values(picks ?? {}));
+  return sides.has('home') && sides.has('away');
+}
+
+function belongsOnActiveBoard(game) {
+  const hasStarted = game.state !== 'pre'
+    || (game.timeKnown && Date.parse(game.start) <= Date.now());
+  return !hasStarted || hasOpposingPicks(game.picks);
+}
+
 function renderGame(game) {
   const picked = game.picks?.[player];
   const open = game.timeKnown && game.state === 'pre' && Date.parse(game.start) > Date.now()
@@ -152,7 +163,8 @@ function renderGames() {
   if (myGames) {
     matches = board.games.filter(game => opponentCount(game.picks, player) > 0);
   } else {
-    const leagueGames = board.games.filter(game => activeLeague === 'all' || game.league === activeLeague);
+    const leagueGames = board.games.filter(game => belongsOnActiveBoard(game)
+      && (activeLeague === 'all' || game.league === activeLeague));
     const days = [...new Set(leagueGames.map(game => game.day))].sort();
     if (!activeDay) activeDay = days.includes(board.today) ? board.today : 'all';
     if (!days.includes(activeDay) && activeDay !== 'all') activeDay = 'all';
