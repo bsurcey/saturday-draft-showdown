@@ -7,7 +7,7 @@
   <meta name="description" content="The Fripp crew’s weekend picks and head-to-head points.">
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="stylesheet" href="/board.css?v=4">
+  <link rel="stylesheet" href="/board.css?v=5">
   <script type="module" src="/board.js?v=5"></script>
 </head>
 <body>
@@ -49,9 +49,9 @@
     <p id="notice" role="status" hidden></p>
     <section class="balance-panel" aria-label="Head-to-head balances">
       <div class="panel-toolbar">
-        <div class="segments" aria-label="Balance view">
-          <button type="button" data-scope="mine" aria-pressed="true">My balances</button>
-          <button type="button" data-scope="group" aria-pressed="false">Group balances</button>
+        <div class="segments" role="group" aria-label="Balance view">
+          <button type="button" data-scope="mine" aria-controls="balances" aria-pressed="true">My balances</button>
+          <button type="button" data-scope="group" aria-controls="balances" aria-pressed="false">Group balances</button>
         </div>
         <span class="refresh-label" id="refresh-label">Connecting</span>
       </div>
