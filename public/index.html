@@ -7,7 +7,7 @@
   <meta name="description" content="The Fripp crew’s weekend picks and head-to-head action.">
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="stylesheet" href="/board.css?v=10">
+  <link rel="stylesheet" href="/board.css?v=11">
   <script type="module" src="/board.js?v=8"></script>
 </head>
 <body>
@@ -86,17 +86,19 @@
       <div id="games" aria-busy="true"><p class="empty">Loading the matchup board…</p></div>
     </section>
 
-    <details class="standings" id="standings">
-      <summary>Overall leaderboard</summary>
-      <div id="ranks"></div>
-    </details>
-
-    <section class="settlement" aria-labelledby="settlement-heading">
-      <div class="settlement-head">
+    <section class="board-panel" aria-labelledby="settlement-heading">
+      <div class="board-panel-heading">
         <h2 id="settlement-heading">Settle Up</h2>
         <p>Based on completed games.</p>
       </div>
       <div id="settlements"></div>
+    </section>
+
+    <section class="board-panel" id="standings" aria-labelledby="standings-heading">
+      <div class="board-panel-heading">
+        <h2 id="standings-heading">Overall Leaderboard</h2>
+      </div>
+      <div id="ranks"></div>
     </section>
   </main>
   <footer id="board-footer" hidden>
