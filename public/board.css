@@ -66,6 +66,7 @@ h1 { font-size: clamp(2rem, 6vw, 3.15rem); line-height: 1.05; letter-spacing: -.
 .segments button { border: 1px solid transparent; background: transparent; color: var(--muted); padding: 7px 9px; font-size: .875rem; font-weight: 680; border-radius: 5px; min-height: 39px; }
 .segments button:hover { background: #f1f2f3; color: var(--ink); }
 .segments button[aria-pressed="true"] { background: var(--ink); color: var(--white); }
+.sport-short { display: none; }
 .refresh-label { color: #adb4ba; font-size: .75rem; text-align: right; }
 #notice { background: #fff1e4; border-left: 3px solid var(--bright); padding: 10px 13px; margin: 0 0 12px; color: #69351b; }
 .empty { color: var(--muted); padding: 22px 16px; line-height: 1.45; }
@@ -136,5 +137,12 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
   .balance-head, .balance-row { grid-template-columns: minmax(66px, .75fr) minmax(75px, 1fr) minmax(80px, 1fr); padding-inline: 8px; gap: 6px; font-size: .8rem; }
   .panel-toolbar { flex-direction: column; align-items: stretch; gap: 5px; padding: 8px; }
   .filters { align-items: flex-start; flex-wrap: wrap; }
+  .sport-filter {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px;
+    width: 100%; padding: 3px; border: 1px solid var(--border); border-radius: 7px; background: var(--white);
+  }
+  .sport-filter button { min-height: 40px; padding: 7px 6px; }
+  .sport-full { display: none; }
+  .sport-short { display: inline; }
   .game-grid { grid-template-columns: 1fr; }
 }

@@ -7,7 +7,7 @@
   <meta name="description" content="The Fripp crew’s weekend picks and head-to-head action.">
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="stylesheet" href="/board.css?v=8">
+  <link rel="stylesheet" href="/board.css?v=9">
   <script type="module" src="/board.js?v=7"></script>
 </head>
 <body>
@@ -72,11 +72,11 @@
         </div>
       </div>
       <div class="filters" id="game-filters">
-        <div class="segments" aria-label="Sport">
-          <button type="button" data-league="all" aria-pressed="true">All sports</button>
-          <button type="button" data-league="ncaaf" aria-pressed="false">College football</button>
-          <button type="button" data-league="ncaam" aria-pressed="false">College basketball</button>
-          <button type="button" data-league="nfl" aria-pressed="false">NFL</button>
+        <div class="segments sport-filter" role="group" aria-label="Sport">
+          <button type="button" data-league="all" aria-label="All sports" aria-pressed="true"><span class="sport-full">All sports</span><span class="sport-short" aria-hidden="true">All</span></button>
+          <button type="button" data-league="ncaaf" aria-label="College football" aria-pressed="false"><span class="sport-full">College football</span><span class="sport-short" aria-hidden="true">CFB</span></button>
+          <button type="button" data-league="ncaam" aria-label="College basketball" aria-pressed="false"><span class="sport-full">College basketball</span><span class="sport-short" aria-hidden="true">CBB</span></button>
+          <button type="button" data-league="nfl" aria-label="NFL" aria-pressed="false"><span class="sport-full">NFL</span><span class="sport-short" aria-hidden="true">NFL</span></button>
         </div>
         <label for="game-day">
           <span class="sr-only">Game day</span>
