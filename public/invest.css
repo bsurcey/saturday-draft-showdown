@@ -49,9 +49,7 @@
   letter-spacing: -.045em;
 }
 .invest-view .statement-value.neutral { color: var(--ink); }
-.invest-view .statement-caption, .invest-view .statement-live-caption { display: none; }
-.invest-view .invest-live-caption { display: inline; }
-.invest-view .statement-live { margin-top: 8px; }
+.invest-view .statement-caption, .invest-view .statement-live { display: none; }
 
 .invest-view .ledger-title,
 .invest-view h2,
