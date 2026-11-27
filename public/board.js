@@ -19,6 +19,7 @@ const text = value => String(value).replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[char]));
 const signed = n => n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '0';
+const signedMoney = n => n > 0 ? '+$' + n : n < 0 ? '−$' + Math.abs(n) : '$0';
 const lineLabel = n => n === null ? '—' : n === 0 ? 'PK' : signed(n);
 const pointClass = n => n > 0 ? 'positive' : n < 0 ? 'negative' : 'neutral';
 
@@ -57,7 +58,7 @@ function balanceAmount(pair, amount, name) {
   const from = name === loser ? 'You owe ' : loser + ' owes ';
   const to = name === winner ? 'you' : winner;
   return '<span class="' + direction + '">' + text(from + to) + ' <strong class="points">'
-    + Math.abs(amount) + '</strong></span>';
+    + '$' + Math.abs(amount) + '</strong></span>';
 }
 
 function renderBalances() {
@@ -83,7 +84,7 @@ function renderBalances() {
       const line = mine === 'home' ? game.line : -game.line;
       const points = game.points * perspective;
       const amount = game.outcome === 'push' ? (game.state === 'live' ? 'Even live' : 'Push')
-        : game.outcome ? signed(points) + (game.state === 'live' ? ' live' : '')
+        : game.outcome ? signedMoney(points) + (game.state === 'live' ? ' live' : '')
           : 'Pending';
       const owner = name || pair.first;
       return '<li><span>' + text(game.away + ' vs. ' + game.home + ' · ' + owner + ' took ' + side + ' ' + lineLabel(line))
@@ -147,7 +148,7 @@ function renderGame(game) {
   if (game.state === 'postponed') state = state || 'Postponed';
   const timing = [state, game.networks?.join(' / ')].filter(Boolean).join(' · ');
   const status = picked ? opponents + (opponents === 1 ? ' opponent' : ' opponents') + ' · '
-    + opponents * board.stake + ' pts' : game.lockedAt ? 'Line locked' : game.homeLine === null ? 'Spread unavailable' : 'Current line';
+    + '$' + opponents * board.stake : game.lockedAt ? 'Line locked' : game.homeLine === null ? 'Spread unavailable' : 'Current line';
   return '<article class="game"><div class="game-meta ' + (game.state === 'live' ? 'live' : '') + '">'
     + '<strong>' + labels[game.league] + '</strong><span>' + text(timing) + '</span></div>'
     + '<div class="teams">' + renderTeam(game, 'away', editable, picked) + renderTeam(game, 'home', editable, picked) + '</div>'
@@ -203,8 +204,8 @@ function render({ force = false } = {}) {
   renderGames();
   $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th><th scope="col">Owed net</th>'
     + '<th scope="col">Live net</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
-    + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signed(row.settled)
-    + '</td><td class="points ' + pointClass(row.live) + '">' + signed(row.live) + '</td></tr>').join('')
+    + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signedMoney(row.settled)
+    + '</td><td class="points ' + pointClass(row.live) + '">' + signedMoney(row.live) + '</td></tr>').join('')
     + '</tbody></table>';
   if (focusedButton) {
     const { game, side } = focusedButton.dataset;
