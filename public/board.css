@@ -30,6 +30,7 @@ a { color: inherit; }
 .brand small { color: #ff9c35; display: block; font-size: .78rem; margin-top: 5px; letter-spacing: .13em; }
 .brand-logo { position: relative; display: block; width: 52px; height: 52px; flex: 0 0 auto; overflow: hidden; border-radius: 6px; background: var(--white); }
 .brand-logo img { position: absolute; left: 50%; top: 50%; height: 123%; width: auto; max-width: none; transform: translate(-50%, -50%); filter: grayscale(1) contrast(1.12); }
+.header-status { display: grid; justify-items: end; gap: 4px; }
 .identity { display: flex; gap: 10px; align-items: center; font-size: .875rem; color: #e0e3e5; }
 select {
   appearance: none; color: var(--ink); border: 1px solid var(--border); background: var(--white);
@@ -66,7 +67,7 @@ h2 { font-size: clamp(1.6rem, 4vw, 2.15rem); letter-spacing: -.035em; }
 .segments button { border: 1px solid transparent; background: transparent; color: var(--muted); padding: 7px 9px; font-size: .875rem; font-weight: 680; border-radius: 5px; min-height: 39px; }
 .segments button:hover { background: #f1f2f3; color: var(--ink); }
 .segments button[aria-pressed="true"] { background: var(--ink); color: var(--white); }
-.refresh-label { color: var(--muted); font-size: .8rem; text-align: right; }
+.refresh-label { color: #adb4ba; font-size: .75rem; text-align: right; }
 #notice { background: #fff1e4; border-left: 3px solid var(--bright); padding: 10px 13px; margin: 0 0 12px; color: #69351b; }
 .empty { color: var(--muted); padding: 22px 16px; line-height: 1.45; }
 .balance-head, .balance-row { display: grid; grid-template-columns: minmax(108px, .95fr) minmax(160px, 1.2fr) minmax(160px, 1.2fr); gap: 12px; align-items: center; }

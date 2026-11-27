@@ -7,7 +7,7 @@
   <meta name="description" content="The Fripp crew’s weekend picks and head-to-head points.">
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="stylesheet" href="/board.css?v=5">
+  <link rel="stylesheet" href="/board.css?v=6">
   <script type="module" src="/board.js?v=5"></script>
 </head>
 <body>
@@ -17,7 +17,10 @@
         <span class="brand-logo"><img src="/fripp-logo.webp" alt=""></span>
         <span>FRIPP ISLAND<small>PICK BOARD</small></span>
       </a>
-      <p class="identity" id="identity" hidden>Playing as <strong id="player-name"></strong></p>
+      <div class="header-status">
+        <p class="identity" id="identity" hidden>Playing as <strong id="player-name"></strong></p>
+        <span class="refresh-label" id="refresh-label">Connecting</span>
+      </div>
     </div>
   </header>
   <div class="identity-status" id="identity-status">
@@ -53,7 +56,6 @@
           <button type="button" data-scope="mine" aria-controls="balances" aria-pressed="true">My balances</button>
           <button type="button" data-scope="group" aria-controls="balances" aria-pressed="false">Group balances</button>
         </div>
-        <span class="refresh-label" id="refresh-label">Connecting</span>
       </div>
       <div id="balances" aria-busy="true"><p class="empty">Loading balances…</p></div>
     </section>
