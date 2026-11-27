@@ -90,6 +90,11 @@
 .invest-view .clear { font-weight: 600; }
 
 @media (max-width: 600px) {
+  .invest-view .matchups > .overview .segments {
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
   .invest-view .segments button { padding-inline: 8px; }
   .invest-view .team { min-height: 44px; }
 }
