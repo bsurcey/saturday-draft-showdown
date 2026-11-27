@@ -1,6 +1,8 @@
 const labels = { ncaaf: 'College football', ncaam: 'College basketball', nfl: 'NFL' };
 const $ = (id) => document.getElementById(id);
 const nameInput = $('player');
+const playerDialog = $('player-dialog');
+const confirmPlayer = $('confirm-player');
 const weekInput = $('week');
 const dayInput = $('game-day');
 const time = new Intl.DateTimeFormat('en-US', {
@@ -21,6 +23,7 @@ const lineLabel = n => n === null ? '—' : n === 0 ? 'PK' : signed(n);
 const pointClass = n => n > 0 ? 'positive' : n < 0 ? 'negative' : 'neutral';
 
 let board;
+let player;
 let activeScope = 'mine';
 let activeLeague = 'all';
 let activeDay;
@@ -29,12 +32,6 @@ let saving = false;
 let saveError = '';
 let loadError = '';
 let lastRender = '';
-
-try {
-  nameInput.value = localStorage.getItem('fripp-player') || '';
-} catch {
-  nameInput.value = '';
-}
 
 function weekLabel(day) {
   const last = new Date(day + 'T00:00:00Z');
@@ -63,11 +60,7 @@ function balanceAmount(pair, amount, name) {
 }
 
 function renderBalances() {
-  const name = activeScope === 'mine' ? nameInput.value : '';
-  if (activeScope === 'mine' && !name) {
-    $('balances').innerHTML = '<p class="empty">Choose your name to see who owes you and who you owe.</p>';
-    return;
-  }
+  const name = activeScope === 'mine' ? player : '';
 
   const visible = board.pairs.filter(pair => name
     ? [pair.first, pair.second].includes(name)
@@ -122,11 +115,10 @@ function renderTeam(game, side, editable, picked) {
 }
 
 function renderGame(game) {
-  const name = nameInput.value;
-  const picked = game.picks?.[name];
+  const picked = game.picks?.[player];
   const open = game.timeKnown && game.state === 'pre' && Date.parse(game.start) > Date.now()
     && board.currentWeek === board.week;
-  const editable = !!name && open && game.homeLine !== null;
+  const editable = !!player && open && game.homeLine !== null;
   const opponents = picked ? Object.values(game.picks).filter(pick => pick !== picked).length : 0;
   let state = game.detail;
   if (game.state === 'pre') state = game.timeKnown ? time.format(new Date(game.start)) + ' CT' : 'Time TBD';
@@ -195,11 +187,16 @@ function render({ force = false } = {}) {
 
 async function readResponse(response) {
   const body = await response.json().catch(() => null);
-  if (!response.ok || !body) throw new Error(body?.error || 'The board is temporarily unavailable.');
+  if (!response.ok || !body) {
+    const error = new Error(body?.error || 'The board is temporarily unavailable.');
+    error.status = response.status;
+    throw error;
+  }
   return body;
 }
 
 async function load() {
+  if (!player) return;
   if (updating) return updating;
   updating = (async () => {
     const week = weekInput.value;
@@ -232,12 +229,81 @@ function setSegment(selector, name, value) {
   }
 }
 
-nameInput.addEventListener('change', () => {
-  try { localStorage.setItem('fripp-player', nameInput.value); } catch {}
-  saveError = '';
-  activeScope = 'mine';
-  setSegment('[data-scope]', 'scope', activeScope);
+function showBoard(name) {
+  player = name;
+  $('player-name').textContent = name;
+  $('identity').hidden = false;
+  $('identity-status').hidden = true;
+  $('board-content').hidden = false;
+  $('board-footer').hidden = false;
+  if (playerDialog.open) playerDialog.close();
   render({ force: true });
+  load();
+}
+
+async function checkIdentity() {
+  const retry = $('retry-identity');
+  retry.hidden = true;
+  $('identity-message').textContent = 'Checking this browser…';
+  try {
+    const identity = await readResponse(await fetch('/api/player', { cache: 'no-store' }));
+    if (identity.player) {
+      showBoard(identity.player);
+      return;
+    }
+    player = undefined;
+    $('identity').hidden = true;
+    $('identity-status').hidden = true;
+    $('board-content').hidden = true;
+    $('board-footer').hidden = true;
+    nameInput.length = 1;
+    for (const name of identity.players) nameInput.add(new Option(name, name));
+    nameInput.value = '';
+    confirmPlayer.disabled = true;
+    confirmPlayer.textContent = 'Continue';
+    $('player-error').hidden = true;
+    if (!playerDialog.open) playerDialog.showModal();
+  } catch (error) {
+    player = undefined;
+    $('identity').hidden = true;
+    $('board-content').hidden = true;
+    $('board-footer').hidden = true;
+    if (playerDialog.open) playerDialog.close();
+    $('identity-status').hidden = false;
+    $('identity-message').textContent = error.message;
+    retry.hidden = false;
+  }
+}
+
+playerDialog.addEventListener('cancel', event => event.preventDefault());
+$('retry-identity').addEventListener('click', checkIdentity);
+nameInput.addEventListener('change', () => {
+  confirmPlayer.disabled = !nameInput.value;
+  confirmPlayer.textContent = nameInput.value ? 'Continue as ' + nameInput.value : 'Continue';
+  $('player-error').hidden = true;
+});
+
+$('player-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  if (confirmPlayer.disabled) return;
+  const name = nameInput.value;
+  const errorMessage = $('player-error');
+  nameInput.disabled = true;
+  confirmPlayer.disabled = true;
+  errorMessage.hidden = true;
+  try {
+    const identity = await readResponse(await fetch('/api/player', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ player: name }),
+    }));
+    showBoard(identity.player);
+  } catch (error) {
+    errorMessage.textContent = error.message;
+    errorMessage.hidden = false;
+  } finally {
+    nameInput.disabled = false;
+    confirmPlayer.disabled = !nameInput.value;
+  }
 });
 
 weekInput.addEventListener('change', async () => {
@@ -271,7 +337,6 @@ $('games').addEventListener('click', async event => {
   const button = event.target.closest('button[data-game]');
   if (!button || saving) return;
   const game = board.games.find(item => item.id === button.dataset.game);
-  const player = nameInput.value;
   if (!game || !player) return;
   saveError = '';
   saving = true;
@@ -286,6 +351,7 @@ $('games').addEventListener('click', async event => {
     }));
   } catch (err) {
     saveError = err.message;
+    if (err.status === 401 || err.status === 403) await checkIdentity();
   } finally {
     if (updating) await updating;
     await load();
@@ -294,6 +360,6 @@ $('games').addEventListener('click', async event => {
   }
 });
 
-load();
+checkIdentity();
 setInterval(() => { if (!saving) load(); }, 25000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && !saving) load(); });

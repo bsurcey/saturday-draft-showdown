@@ -11,3 +11,8 @@
   from = "/api/board"
   to = "/.netlify/functions/board"
   status = 200
+
+[[redirects]]
+  from = "/api/player"
+  to = "/.netlify/functions/player"
+  status = 200

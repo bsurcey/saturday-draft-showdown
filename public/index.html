@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#1a1d20">
   <meta name="description" content="The Fripp crew’s weekend picks and head-to-head points.">
   <title>Fripp Island Pick Board</title>
-  <link rel="stylesheet" href="/board.css">
-  <script type="module" src="/board.js"></script>
+  <link rel="stylesheet" href="/board.css?v=2">
+  <script type="module" src="/board.js?v=2"></script>
 </head>
 <body>
   <header class="masthead">
@@ -16,16 +16,24 @@
         <span class="monogram" aria-hidden="true">FI</span>
         <span>FRIPP ISLAND<small>PICK BOARD</small></span>
       </a>
-      <label class="identity" for="player">Playing as
-        <select id="player">
-          <option value="">Choose your name</option>
-          <option>Brad</option><option>Jeff</option><option>Jason</option><option>Lay</option>
-          <option>Craig</option><option>Herb</option><option>Todd</option>
-        </select>
-      </label>
+      <p class="identity" id="identity" hidden>Playing as <strong id="player-name"></strong></p>
     </div>
   </header>
-  <main>
+  <div class="identity-status" id="identity-status">
+    <p id="identity-message" role="status">Checking this browser…</p>
+    <button type="button" class="primary" id="retry-identity" hidden>Try again</button>
+  </div>
+  <dialog class="player-dialog" id="player-dialog" aria-labelledby="choose-title" aria-describedby="choose-description">
+    <form id="player-form">
+      <h1 id="choose-title">Who’s picking?</h1>
+      <p id="choose-description">Choose your own name. This browser will remember it for future visits.</p>
+      <label for="player">Your name</label>
+      <select id="player" required autofocus><option value="">Choose your name</option></select>
+      <p id="player-error" role="alert" hidden></p>
+      <button type="submit" class="primary" id="confirm-player" disabled>Continue</button>
+    </form>
+  </dialog>
+  <main id="board-content" hidden>
     <div class="overview">
       <div>
         <h1>Who owes whom</h1>
@@ -76,7 +84,7 @@
       <div id="ranks"></div>
     </details>
   </main>
-  <footer>
+  <footer id="board-footer" hidden>
     <a href="/draft-archive.html">Original Fripp football tracker</a>
     <span>Scores and spreads via ESPN</span>
   </footer>

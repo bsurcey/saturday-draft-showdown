@@ -1,4 +1,5 @@
 import { getStore } from '@netlify/blobs';
+import { devicePlayer, deviceToken, openDevices } from '../lib/device.mjs';
 import { alignGame, dayOf, gameView, players, result, shiftDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
 import { featured, leagues, scoreboard, summary } from '../lib/espn.mjs';
 
@@ -28,15 +29,19 @@ async function change(store, update) {
   throw fail('Another pick was saved at the same time. Please try again.', 409);
 }
 
-async function savePick(request, store, now) {
+async function savePick(request, store, deviceStore, now) {
   if (request.headers.get('content-type')?.split(';')[0] !== 'application/json') {
     throw fail('Send picks as JSON.', 415);
   }
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) throw fail('Invalid origin.', 403);
   const body = await request.json().catch(() => null);
-  if (!body || !players.includes(body.player) || !isGameId.test(body.id)
-    || !['home', 'away', null].includes(body.side)) throw fail('Choose a player and a side.', 400);
+  if (!body || !isGameId.test(body.id) || !['home', 'away', null].includes(body.side)) {
+    throw fail('Choose a matchup and a side.', 400);
+  }
+  const player = await devicePlayer(deviceStore, deviceToken(request));
+  if (!player) throw fail('Confirm your name on this browser before making picks.', 401);
+  if (body.player !== player) throw fail('The saved player changed. Check the name before picking again.', 403);
 
   const currentWeek = weekOf(now);
   const today = dayOf(now);
@@ -69,10 +74,10 @@ async function savePick(request, store, now) {
     if (side && (!Number.isFinite(body.line) || line === null || line !== (sameOrder ? body.line : -body.line))) {
       throw fail('The spread changed. Check the updated line and pick again.', 409);
     }
-    if ((existing?.picks[body.player] ?? null) === side) return data;
+    if ((existing?.picks[player] ?? null) === side) return data;
     const picks = { ...existing?.picks };
-    if (side) picks[body.player] = side;
-    else delete picks[body.player];
+    if (side) picks[player] = side;
+    else delete picks[player];
     const entry = existing ?? { game: aligned, week: currentWeek, line, lockedAt: new Date().toISOString() };
     return { ...data, [game.id]: { ...entry, picks } };
   });
@@ -143,12 +148,13 @@ async function readBoard(request, store, now) {
   });
 }
 
-export function makeBoardHandler(openStore = () => getStore({ name: 'fripp-points', consistency: 'strong' })) {
+export function makeBoardHandler(openStore = () => getStore({ name: 'fripp-points', consistency: 'strong' }),
+  openDeviceStore = openDevices) {
   return async request => {
     const now = Date.now();
     try {
       if (request.method === 'GET') return await readBoard(request, openStore(), now);
-      if (request.method === 'POST') return await savePick(request, openStore(), now);
+      if (request.method === 'POST') return await savePick(request, openStore(), openDeviceStore(), now);
       return json({ error: 'Method not allowed.' }, 405);
     } catch (error) {
       if (!error.status) console.error('Fripp board:', error);

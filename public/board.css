@@ -37,7 +37,19 @@ select {
   background-size: 5px 5px; background-repeat: no-repeat;
   background-position: calc(100% - 14px) 53%, calc(100% - 9px) 53%;
 }
-.identity select { background-color: #303438; color: var(--white); border-color: #555c63; font-weight: 650; }
+.identity strong { color: var(--white); font-size: 1rem; }
+.identity-status { width: min(400px, calc(100% - 40px)); margin: 32px auto; text-align: center; color: var(--muted); }
+.identity-status button { margin-top: 12px; }
+.player-dialog { color: var(--ink); width: min(420px, calc(100% - 32px)); border: 1px solid var(--border); border-top: 4px solid var(--bright); border-radius: 10px; padding: 25px; }
+.player-dialog::backdrop { background: #1a1d20a8; }
+.player-dialog form { display: grid; gap: 12px; }
+.player-dialog h1 { font-size: 2rem; }
+.player-dialog p { color: var(--muted); line-height: 1.45; }
+.player-dialog label { font-weight: 700; margin-top: 4px; }
+.player-dialog select { width: 100%; min-height: 44px; }
+.player-dialog #player-error { color: var(--red); }
+.primary { min-height: 44px; padding: 8px 14px; border: 0; border-radius: 6px; color: var(--white); background: var(--ink); font-weight: 750; }
+.primary:disabled { opacity: .55; }
 main { padding: 35px 0 30px; }
 .overview { display: flex; justify-content: space-between; align-items: flex-end; gap: 15px; margin: 0 0 17px; }
 h1, h2, p { margin: 0; }
@@ -109,8 +121,7 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
 @media (max-width: 600px) {
   .header-inner, main, footer { width: calc(100% - 24px); }
   main { padding-top: 24px; }
-  .identity { font-size: 0; }
-  .identity select { font-size: .875rem; max-width: 145px; }
+  .identity { gap: 5px; font-size: .8rem; }
   .brand { gap: 7px; font-size: .85rem; }
   .monogram { width: 36px; height: 36px; }
   .week-selector span { display: none; }
