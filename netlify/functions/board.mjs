@@ -134,8 +134,11 @@ async function readBoard(request, store, now) {
 
   for (const entry of entries) {
     if (entry.week !== week && !(week === currentWeek && board.has(entry.game.id))) continue;
+    const game = gameView(entry, feedGames);
+    const networks = [game.networks, feedGames.get(entry.game.id)?.networks, entry.game.networks]
+      .find(list => list?.length) ?? [];
     board.set(entry.game.id, {
-      ...gameView(entry, feedGames), homeLine: entry.line, lockedAt: entry.lockedAt, picks: entry.picks,
+      ...game, networks, homeLine: entry.line, lockedAt: entry.lockedAt, picks: entry.picks,
     });
   }
 

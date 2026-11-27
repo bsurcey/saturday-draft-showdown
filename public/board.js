@@ -126,10 +126,11 @@ function renderGame(game) {
   if (game.state === 'final') state = state || 'Final';
   if (game.state === 'void') state = state || 'Canceled';
   if (game.state === 'postponed') state = state || 'Postponed';
+  const timing = [state, game.networks?.join(' / ')].filter(Boolean).join(' · ');
   const status = picked ? opponents + (opponents === 1 ? ' opponent' : ' opponents') + ' · '
     + opponents * board.stake + ' pts' : game.lockedAt ? 'Line locked' : game.homeLine === null ? 'Spread unavailable' : 'Current line';
   return '<article class="game"><div class="game-meta ' + (game.state === 'live' ? 'live' : '') + '">'
-    + '<strong>' + labels[game.league] + '</strong><span>' + text(state) + '</span></div>'
+    + '<strong>' + labels[game.league] + '</strong><span>' + text(timing) + '</span></div>'
     + '<div class="teams">' + renderTeam(game, 'away', editable, picked) + renderTeam(game, 'home', editable, picked) + '</div>'
     + '<div class="game-bottom"><span>' + status + (picked && game.lockedAt ? ' · Line locked' : '') + '</span>'
     + (picked && editable ? '<button type="button" class="clear" data-game="' + game.id + '" data-side="clear"'

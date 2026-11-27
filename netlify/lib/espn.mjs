@@ -46,6 +46,20 @@ function normalizeTeam(competitor) {
   };
 }
 
+function broadcastNetworks(competition) {
+  const names = [
+    ...(competition.broadcasts ?? []).flatMap(broadcast => broadcast.names ?? []),
+    ...(competition.geoBroadcasts ?? []).map(broadcast => broadcast.media?.shortName || broadcast.media?.name),
+  ];
+  const unique = new Map();
+  for (const name of names) {
+    if (typeof name !== 'string' || !name.trim()) continue;
+    const label = name.trim();
+    if (!unique.has(label.toLowerCase())) unique.set(label.toLowerCase(), label);
+  }
+  return [...unique.values()];
+}
+
 function normalize(league, id, competition, status) {
   const home = competition?.competitors?.find(team => team.homeAway === 'home');
   const away = competition?.competitors?.find(team => team.homeAway === 'away');
@@ -64,6 +78,7 @@ function normalize(league, id, competition, status) {
     homeLine: homeSpread(competition),
     home: normalizeTeam(home), away: normalizeTeam(away),
     timeKnown: competition.timeValid !== false && !/TBD|TBA/i.test(type?.detail ?? ''),
+    networks: broadcastNetworks(competition),
   };
 }
 
