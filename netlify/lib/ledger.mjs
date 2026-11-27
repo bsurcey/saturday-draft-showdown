@@ -4,6 +4,9 @@ export const stake = 20;
 const calendar = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit',
 });
+const centralHour = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Chicago', hour: '2-digit', hourCycle: 'h23',
+});
 
 export const dayOf = (date) => calendar.format(new Date(date));
 
@@ -11,6 +14,11 @@ export function shiftDay(day, days) {
   const date = new Date(day + 'T00:00:00Z');
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().slice(0, 10);
+}
+
+export function slateDay(date) {
+  const day = dayOf(date);
+  return Number(centralHour.format(date)) < 4 ? shiftDay(day, -1) : day;
 }
 
 export function weekOf(date) {

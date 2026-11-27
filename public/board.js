@@ -29,7 +29,7 @@ let player;
 let activeScope = 'mine';
 let activeGameView = 'all';
 let activeLeague = 'all';
-let activeDay;
+let activeDay = 'auto';
 let updating;
 let saving = false;
 let saveError = '';
@@ -188,12 +188,21 @@ function renderGames() {
     const leagueGames = board.games.filter(game => belongsOnActiveBoard(game)
       && (activeLeague === 'all' || game.league === activeLeague));
     const days = [...new Set(leagueGames.map(game => game.day))].sort();
-    if (!activeDay) activeDay = days.includes(board.today) ? board.today : 'all';
-    if (!days.includes(activeDay) && activeDay !== 'all') activeDay = 'all';
-    dayInput.innerHTML = '<option value="all">All days</option>' + days.map(day =>
+    const displayDay = board.displayDay ?? board.today;
+    const automatic = activeDay === 'auto';
+    const defaultDay = days.includes(displayDay) ? displayDay : 'all';
+    const selectedDay = automatic ? defaultDay : activeDay;
+    if (!automatic && activeDay !== 'all' && !days.includes(activeDay)) {
+      days.push(activeDay);
+      days.sort();
+    }
+    const defaultLabel = defaultDay === 'all' ? 'All days' : formatDay(defaultDay);
+    dayInput.innerHTML = '<option value="auto">Auto · ' + defaultLabel + '</option>'
+      + '<option value="all">All days</option>' + days.map(day =>
       '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
     dayInput.value = activeDay;
-    matches = leagueGames.filter(game => activeDay === 'all' || game.day === activeDay);
+    matches = leagueGames.filter(game => selectedDay === 'all' || game.day === selectedDay
+      || (automatic && game.day < displayDay && game.state === 'live'));
   }
   const groups = Map.groupBy(matches, game => game.day);
   $('games').innerHTML = [...groups].map(([day, games]) => '<h3 class="game-day-title">' + formatDay(day)
@@ -247,7 +256,7 @@ function renderSettlements() {
 function render({ force = false } = {}) {
   refreshStatus();
   if (!board) return;
-  const signature = JSON.stringify([board.week, board.history, board.games, board.pairs, saving]);
+  const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs, saving]);
   if (!force && signature === lastRender) return;
   lastRender = signature;
 
@@ -292,7 +301,6 @@ async function load() {
   updating = (async () => {
     try {
       const next = await readResponse(await fetch('/api/board', { cache: 'no-store' }));
-      if (board?.week !== next.week) activeDay = undefined;
       board = next;
       loadError = '';
       render();

@@ -1,6 +1,6 @@
 import { getStore } from '@netlify/blobs';
 import { devicePlayer, deviceToken, openDevices } from '../lib/device.mjs';
-import { alignGame, dayOf, gameView, players, result, shiftDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
+import { alignGame, dayOf, gameView, players, result, shiftDay, slateDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
 import { featured, leagues, scoreboard, summary } from '../lib/espn.mjs';
 
 const key = 'games-v2';
@@ -45,6 +45,8 @@ async function savePick(request, store, deviceStore, now) {
 
   const currentWeek = weekOf(now);
   const today = dayOf(now);
+  const displayDay = slateDay(now);
+  const yesterday = shiftDay(today, -1);
   const day = body.day;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < today || day > shiftDay(currentWeek, 6)) {
     throw fail('Picks are closed for this matchup.', 409);
@@ -90,6 +92,9 @@ async function readBoard(request, store, now) {
   const today = dayOf(now);
   const requestWeek = new URL(request.url).searchParams.get('week');
   const todayFeeds = [];
+  if (yesterday < currentWeek) {
+    for (const league of Object.keys(leagues)) todayFeeds.push({ day: yesterday, league });
+  }
   for (let i = 0; i < 7; i++) {
     const day = shiftDay(currentWeek, i);
     for (const league of Object.keys(leagues)) todayFeeds.push({ day, league });
@@ -130,11 +135,16 @@ async function readBoard(request, store, now) {
   const history = [...new Set(entries.map(entry => entry.week).concat(currentWeek))].sort().reverse();
   const week = history.includes(requestWeek) ? requestWeek : currentWeek;
   const board = new Map(week === currentWeek ? featured([...feedGames.values()]
-    .filter(game => game.day >= week && game.day <= shiftDay(week, 6))).map(game => [game.id, game]) : []);
+    .filter(game => game.day >= (yesterday < week ? yesterday : week) && game.day <= shiftDay(week, 6)))
+    .map(game => [game.id, game]) : []);
 
   for (const entry of entries) {
-    if (entry.week !== week && !(week === currentWeek && board.has(entry.game.id))) continue;
     const game = gameView(entry, feedGames);
+    const carriesOver = week === currentWeek && (
+      board.has(game.id) || game.day === yesterday
+      || (!entry.final && game.state === 'live' && game.day < today)
+    );
+    if (entry.week !== week && !carriesOver) continue;
     const networks = [game.networks, feedGames.get(entry.game.id)?.networks, entry.game.networks]
       .find(list => list?.length) ?? [];
     board.set(entry.game.id, {
@@ -146,7 +156,7 @@ async function readBoard(request, store, now) {
   const errors = [...new Set(todayFeeds.filter((_, index) => feeds[index].status === 'rejected')
     .map(item => item.league))];
   return json({
-    week, currentWeek, today, history, games, players, stake, errors, updatedAt: new Date().toISOString(),
+    week, currentWeek, today, displayDay, history, games, players, stake, errors, updatedAt: new Date().toISOString(),
     ...summarize(entries, feedGames, week),
   });
 }
