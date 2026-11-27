@@ -18,9 +18,13 @@
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
   <link rel="stylesheet" href="/board.css?v=14">
   <link rel="stylesheet" href="/statement.css?v=1">
+  <link rel="stylesheet" href="/gameday.css?v=1">
   <script>
-    if (new URLSearchParams(location.search).get('view') === 'statement') {
+    const view = new URLSearchParams(location.search).get('view');
+    if (view === 'statement') {
       document.documentElement.classList.add('statement-view');
+    } else if (view === 'gameday') {
+      document.documentElement.classList.add('gameday-view');
     }
   </script>
   <script type="module" src="/board.js?v=12"></script>

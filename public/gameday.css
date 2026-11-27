@@ -1,0 +1,116 @@
+.gameday-view {
+  --paper: #f6f1e7;
+  --white: #fffcf6;
+  --ink: #27241e;
+  --muted: #635c50;
+  --border: #dcd2be;
+  --bright: #c6581b;
+  --orange: #9b3c11;
+  --green: #245947;
+  --red: #9a3228;
+  --display: Georgia, "Times New Roman", serif;
+}
+
+.gameday-view .header-inner,
+.gameday-view main,
+.gameday-view footer { width: min(1160px, calc(100% - 64px)); }
+.gameday-view .masthead {
+  color: var(--ink);
+  background: var(--white);
+  border-top: 5px solid var(--bright);
+  border-bottom: 1px solid var(--border);
+}
+.gameday-view .header-inner { min-height: 104px; }
+.gameday-view .header-brand { gap: 14px; }
+.gameday-view .brand-logo { border: 1px solid var(--border); border-radius: 50%; background: #fff; }
+.gameday-view .brand {
+  color: var(--ink);
+  font: 700 clamp(1.125rem, 3vw, 2rem)/1.05 var(--display);
+  letter-spacing: -.055em;
+}
+.gameday-view .season-note { margin-top: 6px; color: var(--muted); font-size: .8125rem; }
+.gameday-view .identity, .gameday-view .refresh-label { color: var(--muted); }
+.gameday-view .identity strong { color: var(--ink); }
+.gameday-view .statement-classic { display: inline; }
+.gameday-view main { padding-block: 32px; }
+
+.gameday-view .overview {
+  gap: 12px;
+  align-items: baseline;
+  border-top: 2px solid var(--ink);
+  padding-top: 12px;
+  margin-bottom: 16px;
+}
+.gameday-view .ledger-title, .gameday-view h2 {
+  font-family: var(--display);
+  font-size: clamp(1.875rem, 4vw, 2.75rem);
+  line-height: 1.06;
+  letter-spacing: -.055em;
+}
+.gameday-view .overview p { margin-top: 5px; font-size: .875rem; }
+.gameday-view .matchups { margin-top: 36px; }
+.gameday-view .balance-panel, .gameday-view .board-panel, .gameday-view .game { border-radius: 2px; }
+.gameday-view .balance-panel { background: transparent; border: 0; border-bottom: 1px solid var(--border); }
+.gameday-view .panel-toolbar { padding: 0 0 8px; }
+.gameday-view .segments { gap: 4px 10px; padding: 0; border: 0; background: transparent; }
+.gameday-view .segments button {
+  min-height: 42px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 6px 8px;
+}
+.gameday-view .segments button:hover { background: #eee6d7; }
+.gameday-view .segments button[aria-pressed="true"] {
+  background: transparent;
+  color: var(--orange);
+  border-bottom-color: var(--bright);
+}
+.gameday-view .balance-head { background: #eee5d5; }
+.gameday-view .balance-item + .balance-item { border-top-color: var(--border); }
+.gameday-view .balance-row:hover, .gameday-view .balance-item[open] { background: var(--white); }
+.gameday-view .balance-head > :not(:first-child),
+.gameday-view .balance-row > :not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.gameday-view .rank-table td, .gameday-view .rank-table th:not(:first-child) { text-align: right; }
+.gameday-view .board-panel-heading { padding-block: 14px; }
+.gameday-view #past-weeks .panel-toolbar { padding-inline: 16px; }
+
+.gameday-view .filters { margin-bottom: 16px; }
+.gameday-view .game-day-title {
+  font-size: .8125rem;
+  color: var(--muted);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.gameday-view .game-grid { gap: 12px; }
+.gameday-view .game { border-top: 2px solid #b7ab94; }
+.gameday-view .game:has(.game-meta.live) { border-top-color: var(--bright); }
+.gameday-view .game-meta { padding-bottom: 7px; }
+.gameday-view .game-meta.live strong { color: var(--orange); }
+.gameday-view .game-meta.live strong::before { content: "●"; margin-right: 5px; font-size: .65em; }
+.gameday-view .teams { gap: 1px; }
+.gameday-view .team {
+  min-height: 41px;
+  grid-template-columns: 24px minmax(0, 1fr) 3ch minmax(42px, auto);
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+}
+.gameday-view .team + .team { border-top-color: var(--border); }
+.gameday-view .team.selected { background: #f7e5d4; border-color: #e0ae89; box-shadow: inset 3px 0 var(--bright); }
+.gameday-view button.team:enabled:hover { border-color: var(--bright); }
+.gameday-view .score { text-align: right; font-size: 1.0625rem; }
+.gameday-view .spread { color: var(--muted); }
+.gameday-view .team.selected .spread { color: var(--orange); }
+.gameday-view .game-bottom { min-height: 35px; }
+
+@media (max-width: 600px) {
+  .gameday-view .header-inner, .gameday-view main, .gameday-view footer { width: calc(100% - 32px); }
+  .gameday-view .header-brand { gap: 10px; }
+  .gameday-view .brand { font-size: clamp(.95rem, 4.3vw, 1.25rem); white-space: normal; }
+  .gameday-view .header-status { margin-left: 53px; }
+  .gameday-view main { padding-block: 24px; }
+  .gameday-view .segments button, .gameday-view .team { min-height: 44px; }
+  .gameday-view .game-grid { gap: 10px; }
+}
