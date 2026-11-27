@@ -25,6 +25,12 @@
       document.documentElement.classList.add('statement-view');
     } else if (view === 'gameday') {
       document.documentElement.classList.add('gameday-view');
+    } else if (view === 'invest') {
+      document.documentElement.classList.add('invest-view');
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = '/invest.css?v=1';
+      document.head.append(stylesheet);
     }
   </script>
   <script type="module" src="/board.js?v=12"></script>

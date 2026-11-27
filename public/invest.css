@@ -1,0 +1,95 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap");
+
+.invest-view {
+  color-scheme: dark;
+  --paper: #110e08;
+  --white: #1c180d;
+  --ink: #fff;
+  --muted: #d4d0c9;
+  --border: #4d4a46;
+  --bright: #cf0;
+  --orange: #cf0;
+  --green: #cf0;
+  --red: #ff9a84;
+  --display: Newsreader, Georgia, serif;
+  font-family: Figtree, Helvetica, Arial, sans-serif;
+}
+
+.invest-view .masthead {
+  background: #000;
+  border-bottom: 1px solid #35322d;
+}
+.invest-view .brand {
+  color: var(--bright);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.invest-view .brand-logo { background: #fff; border-radius: 50%; }
+.invest-view .identity, .invest-view .refresh-label, .invest-view .season-note { color: var(--muted); }
+.invest-view .identity strong { color: var(--ink); }
+.invest-view .statement-classic { display: inline; }
+.invest-view :focus-visible { outline-color: var(--bright); }
+
+.invest-view .ledger-title,
+.invest-view h2,
+.invest-view .player-dialog h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -.025em;
+}
+.invest-view .ledger-title, .invest-view .matchups h2 { font-size: clamp(2.25rem, 5vw, 3.25rem); }
+.invest-view .board-panel h2 { font-size: clamp(1.875rem, 4vw, 2.5rem); }
+.invest-view .overview p { font-size: 1rem; line-height: 1.5; letter-spacing: -.015em; }
+.invest-view .balance-panel, .invest-view .board-panel { border-radius: 20px; }
+.invest-view .balance-panel, .invest-view .board-panel, .invest-view .game { border-color: #35322d; }
+.invest-view .balance-head { background: #292316; }
+.invest-view .balance-item + .balance-item { border-top-color: #35322d; }
+.invest-view .balance-row:hover, .invest-view .balance-item[open] { background: #272113; }
+.invest-view .balance-head, .invest-view .balance-row, .invest-view .rank-table { font-variant-numeric: tabular-nums; }
+.invest-view .rank-table th, .invest-view .rank-table td { border-top-color: #35322d; }
+.invest-view #notice { color: var(--ink); background: #302917; }
+.invest-view .player-dialog { background: var(--white); }
+
+.invest-view .segments { gap: 5px; background: transparent; padding: 0; border: 0; }
+.invest-view .segments button, .invest-view .primary, .invest-view select {
+  min-height: 44px;
+  border-radius: 36px;
+  font-weight: 500;
+}
+.invest-view .segments button {
+  border: 1px solid var(--border);
+  padding: 0 15px;
+  color: var(--muted);
+}
+.invest-view .segments button:hover, .invest-view select:hover { border-color: var(--bright); color: var(--ink); background-color: #252013; }
+.invest-view .segments button[aria-pressed="true"], .invest-view .primary {
+  border-color: var(--bright);
+  color: #110e08;
+  background: var(--bright);
+}
+.invest-view .primary { padding-inline: 32px; }
+.invest-view select { padding-inline: 16px 32px; }
+
+.invest-view .game { border-radius: 14px; }
+.invest-view .game-meta strong { color: var(--muted); font-weight: 600; }
+.invest-view .game-meta.live strong { color: var(--bright); }
+.invest-view .game-meta.live strong::before { content: "●"; font-size: .7em; margin-right: 5px; }
+.invest-view .team {
+  grid-template-columns: 25px minmax(0, 1fr) 3ch minmax(38px, auto);
+  background: #211c10;
+  border-color: #35322d;
+  border-radius: 10px;
+}
+.invest-view .score { text-align: right; font-weight: 700; }
+.invest-view .spread { color: var(--muted); }
+.invest-view .team.selected { background: #292e13; border-color: var(--bright); }
+.invest-view .team.selected .spread { color: var(--bright); }
+.invest-view button.team:enabled:hover { border-color: var(--bright); }
+.invest-view .team-name { font-weight: 650; }
+.invest-view .clear { font-weight: 600; }
+
+@media (max-width: 600px) {
+  .invest-view .segments button { padding-inline: 8px; }
+  .invest-view .team { min-height: 44px; }
+}
