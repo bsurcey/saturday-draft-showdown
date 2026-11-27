@@ -23,7 +23,7 @@ button:focus-visible, a:focus-visible, select:focus-visible, summary:focus-visib
   outline-offset: 3px;
 }
 a { color: inherit; }
-.masthead { background: var(--ink); border-top: 4px solid var(--bright); color: var(--white); }
+.masthead { background: var(--ink); color: var(--white); }
 .header-inner, main, footer { width: min(1100px, calc(100% - 48px)); margin-inline: auto; }
 .header-inner { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 850; line-height: 1.02; letter-spacing: .025em; text-decoration: none; }
@@ -60,7 +60,6 @@ h2 { font-size: clamp(1.6rem, 4vw, 2.15rem); letter-spacing: -.035em; }
 .overview p { margin-top: 7px; color: var(--muted); }
 .week-selector { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .875rem; white-space: nowrap; }
 .balance-panel, .standings, .game { background: var(--white); border: 1px solid var(--border); border-radius: 9px; }
-.balance-panel { border-top: 3px solid var(--bright); }
 .panel-toolbar, .filters { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .panel-toolbar { padding: 12px 15px; border-bottom: 1px solid var(--border); }
 .segments { display: flex; flex-wrap: wrap; gap: 5px; }
