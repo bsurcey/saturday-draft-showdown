@@ -98,7 +98,7 @@ function renderBalances() {
       + (details ? '<ul>' + details + '</ul>' : '') + '</div></details>';
   }).join('');
   $('balances').innerHTML = '<div class="balance-head"><span>Players</span><span>Owed now</span>'
-    + '<span>If games ended now</span></div>' + rows;
+    + '<span>Live net</span></div>' + rows;
 }
 
 function renderTeam(game, side, editable, picked) {
