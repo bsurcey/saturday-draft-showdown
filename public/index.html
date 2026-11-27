@@ -7,16 +7,19 @@
   <meta name="description" content="The Fripp crew’s weekend picks and head-to-head action.">
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
-  <link rel="stylesheet" href="/board.css?v=11">
+  <link rel="stylesheet" href="/board.css?v=12">
   <script type="module" src="/board.js?v=9"></script>
 </head>
 <body>
   <header class="masthead">
     <div class="header-inner">
-      <a class="brand" href="/" aria-label="Fripp Island Pick Board home">
+      <div class="header-brand">
         <span class="brand-logo"><img src="/fripp-logo.webp" alt=""></span>
-        <span>FRIPP ISLAND<small>PICK BOARD</small></span>
-      </a>
+        <div>
+          <a class="brand" href="/" aria-label="Fripp Island Pick Board home">FRIPP ISLAND <span>PICK BOARD</span></a>
+          <p class="season-note">We’ll settle up after the last game that starts on Dec 31 goes final.</p>
+        </div>
+      </div>
       <div class="header-status">
         <p class="identity" id="identity" hidden>Playing as <strong id="player-name"></strong></p>
         <span class="refresh-label" id="refresh-label">Connecting</span>
