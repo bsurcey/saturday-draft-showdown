@@ -129,9 +129,11 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
   .header-inner, main, footer { width: calc(100% - 24px); }
   .header-inner { flex-direction: column; align-items: stretch; gap: 10px; padding-block: 14px; }
   .header-brand { gap: 8px; }
-  .header-status { display: flex; justify-content: flex-end; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
+  .header-status { display: flex; justify-content: flex-start; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-left: 51px; }
   main { padding-top: 24px; }
-  .identity { gap: 5px; font-size: .8rem; }
+  .identity { gap: 5px; font-size: .75rem; }
+  .identity::after { content: "·"; margin-left: 1px; color: #adb4ba; }
+  .identity strong { font-size: .75rem; }
   .brand { font-size: .875rem; }
   .brand-logo { width: 43px; height: 43px; }
   .week-selector span { display: none; }
