@@ -24,7 +24,9 @@
   letter-spacing: 0;
 }
 .invest-view .brand-logo { background: #fff; border-radius: 50%; }
-.invest-view .identity, .invest-view .refresh-label, .invest-view .season-note { color: var(--muted); }
+.invest-view .identity, .invest-view .refresh-label { color: var(--muted); }
+.invest-view .season-note, .invest-view .ledger-cutoff { display: none; }
+.invest-view .invest-settlement-note { display: inline; }
 .invest-view .identity strong { color: var(--ink); }
 .invest-view .statement-classic { display: inline; }
 .invest-view :focus-visible { outline-color: var(--bright); }
