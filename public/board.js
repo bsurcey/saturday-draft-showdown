@@ -101,7 +101,8 @@ function renderBalances({ pairs = board.pairs, target = $('balances'), name = ac
       + (details ? '<ul>' + details + '</ul>' : '') + '</div></details>';
   }).join('');
   target.innerHTML = '<div class="balance-head"><span>Players</span>'
-    + (archived ? '<span>Settled total</span><span>Week’s results</span>' : '<span>Owed now</span><span>Live net</span>')
+    + (archived ? '<span>Settled total</span><span>Week’s results</span>'
+      : '<span>Owed now</span><span>' + (investView ? 'If scores hold' : 'Live net') + '</span>')
     + '</div>' + rows;
 }
 
