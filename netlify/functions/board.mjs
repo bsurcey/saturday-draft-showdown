@@ -45,8 +45,6 @@ async function savePick(request, store, deviceStore, now) {
 
   const currentWeek = weekOf(now);
   const today = dayOf(now);
-  const displayDay = slateDay(now);
-  const yesterday = shiftDay(today, -1);
   const day = body.day;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < today || day > shiftDay(currentWeek, 6)) {
     throw fail('Picks are closed for this matchup.', 409);
@@ -90,6 +88,8 @@ async function savePick(request, store, deviceStore, now) {
 async function readBoard(request, store, now) {
   const currentWeek = weekOf(now);
   const today = dayOf(now);
+  const displayDay = slateDay(now);
+  const yesterday = shiftDay(today, -1);
   const requestWeek = new URL(request.url).searchParams.get('week');
   const todayFeeds = [];
   if (yesterday < currentWeek) {
