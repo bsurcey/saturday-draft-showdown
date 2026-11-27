@@ -8,7 +8,7 @@
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
   <link rel="stylesheet" href="/board.css?v=14">
-  <script type="module" src="/board.js?v=9"></script>
+  <script type="module" src="/board.js?v=10"></script>
 </head>
 <body>
   <header class="masthead">
@@ -44,12 +44,8 @@
     <div class="overview">
       <div>
         <h1 class="ledger-title">The Ledger</h1>
-        <p id="week-label">Loading this week…</p>
+        <p>Running balances through Dec 31</p>
       </div>
-      <label class="week-selector" for="week">
-        <span>Week</span>
-        <select id="week" disabled><option value="">This week</option></select>
-      </label>
     </div>
 
     <p id="notice" role="status" hidden></p>
@@ -103,6 +99,14 @@
       </div>
       <div id="settlements"></div>
     </section>
+
+    <details class="board-panel" id="past-weeks">
+      <summary class="board-panel-heading">Past weeks</summary>
+      <div class="panel-toolbar">
+        <select id="week" aria-label="Choose a past week" disabled><option value="">Choose a week</option></select>
+      </div>
+      <div id="history-balances"><p class="empty" role="status">Loading week history…</p></div>
+    </details>
   </main>
   <footer id="board-footer" hidden>
     <a href="/draft-archive.html">Original Fripp football tracker</a>

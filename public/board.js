@@ -4,6 +4,7 @@ const nameInput = $('player');
 const playerDialog = $('player-dialog');
 const confirmPlayer = $('confirm-player');
 const weekInput = $('week');
+const historyBalances = $('history-balances');
 const dayInput = $('game-day');
 const time = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit',
@@ -61,18 +62,17 @@ function balanceAmount(pair, amount, name) {
     + '$' + Math.abs(amount) + '</strong></span>';
 }
 
-function renderBalances() {
-  const name = activeScope === 'mine' ? player : '';
-
-  const visible = board.pairs.filter(pair => name
+function renderBalances({ pairs = board.pairs, target = $('balances'), name = activeScope === 'mine' ? player : '', archived = false } = {}) {
+  const visible = pairs.filter(pair => name
     ? [pair.first, pair.second].includes(name)
     : pair.settled || pair.live || pair.games.length);
   if (!visible.length) {
-    $('balances').innerHTML = '<p class="empty">Everyone is even. Balances will appear as picks face off.</p>';
+    target.innerHTML = archived ? '<p class="empty">No head-to-head results for this week.</p>'
+      : '<p class="empty">Everyone is even. Balances will appear as picks face off.</p>';
     return;
   }
 
-  const open = new Set([...$('balances').querySelectorAll('details[open]')].map(item => item.dataset.pair));
+  const open = new Set([...target.querySelectorAll('details[open]')].map(item => item.dataset.pair));
   const rows = visible.map(pair => {
     const other = name === pair.first ? pair.second : pair.first;
     const title = name ? other : pair.first + ' / ' + pair.second;
@@ -92,13 +92,34 @@ function renderBalances() {
     }).join('');
     return '<details class="balance-item" data-pair="' + key + '"' + (open.has(key) ? ' open' : '') + '>'
       + '<summary class="balance-row"><strong class="pair-title">' + text(title) + '</strong>'
-      + balanceAmount(pair, pair.settled, name) + balanceAmount(pair, pair.live, name) + '</summary>'
+      + balanceAmount(pair, pair.settled, name) + balanceAmount(pair, archived ? pair.week : pair.live, name) + '</summary>'
       + '<div class="balance-details"><p>Starting balance · ' + balanceAmount(pair, pair.starting, name)
-      + ' <span> | </span> This week’s results · ' + balanceAmount(pair, pair.week, name) + '</p>'
+      + ' <span> | </span> Week’s results · ' + balanceAmount(pair, pair.week, name) + '</p>'
       + (details ? '<ul>' + details + '</ul>' : '') + '</div></details>';
   }).join('');
-  $('balances').innerHTML = '<div class="balance-head"><span>Players</span><span>Owed now</span>'
-    + '<span>Live net</span></div>' + rows;
+  target.innerHTML = '<div class="balance-head"><span>Players</span>'
+    + (archived ? '<span>Settled total</span><span>Week’s results</span>' : '<span>Owed now</span><span>Live net</span>')
+    + '</div>' + rows;
+}
+
+function renderHistoryOptions() {
+  const weeks = board.history.filter(week => week !== board.currentWeek);
+  const key = weeks.join(',');
+  if (weekInput.dataset.weeks === key) return;
+  const selected = weekInput.value;
+  weekInput.dataset.weeks = key;
+  weekInput.disabled = !weeks.length;
+  weekInput.replaceChildren(new Option('Choose a week', ''), ...weeks.map(week => new Option(weekLabel(week), week)));
+  if (weeks.includes(selected)) {
+    weekInput.value = selected;
+  } else {
+    historyBalances.textContent = '';
+    historyBalances.append(Object.assign(document.createElement('p'), {
+      className: 'empty',
+      textContent: weeks.length ? 'Choose a week, then open a player matchup to see the games behind the balance.'
+        : 'Past weeks will appear here once there’s a previous week with picks.',
+    }));
+  }
 }
 
 function renderTeam(game, side, editable, picked) {
@@ -234,11 +255,7 @@ function render({ force = false } = {}) {
   const focusedButton = focused.dataset.game && focused.dataset.side
     ? [...$('games').querySelectorAll('button[data-game]')].find(button => button === focused) : null;
   const focusedPair = focused.parentElement?.dataset.pair;
-  $('week-label').textContent = (board.week === board.currentWeek ? 'This week · ' : '') + weekLabel(board.week);
-  weekInput.disabled = false;
-  weekInput.innerHTML = board.history.map(week => '<option value="' + week + '">'
-    + (week === board.currentWeek ? 'This week' : weekLabel(week)) + '</option>').join('');
-  weekInput.value = board.week;
+  renderHistoryOptions();
   $('balances').ariaBusy = 'false';
   $('games').ariaBusy = 'false';
 
@@ -273,12 +290,8 @@ async function load() {
   if (!player) return;
   if (updating) return updating;
   updating = (async () => {
-    const week = weekInput.value;
     try {
-      const current = board?.currentWeek === week;
-      const query = week && !current ? '?week=' + encodeURIComponent(week) : '';
-      const next = await readResponse(await fetch('/api/board' + query, { cache: 'no-store' }));
-      if (weekInput.value !== week) return;
+      const next = await readResponse(await fetch('/api/board', { cache: 'no-store' }));
       if (board?.week !== next.week) activeDay = undefined;
       board = next;
       loadError = '';
@@ -380,10 +393,29 @@ $('player-form').addEventListener('submit', async event => {
   }
 });
 
+let historyRequest;
 weekInput.addEventListener('change', async () => {
-  const pending = updating;
-  if (pending) await pending;
-  await load();
+  historyRequest?.abort();
+  const week = weekInput.value;
+  if (!week) {
+    historyBalances.innerHTML = '<p class="empty">Choose a week, then open a player matchup to see the games behind the balance.</p>';
+    return;
+  }
+  const request = new AbortController();
+  historyRequest = request;
+  historyBalances.innerHTML = '<p class="empty" role="status">Loading balances for this week…</p>';
+  try {
+    const past = await readResponse(await fetch('/api/board?week=' + encodeURIComponent(week), {
+      cache: 'no-store', signal: request.signal,
+    }));
+    if (request.signal.aborted || weekInput.value !== week) return;
+    if (past.week !== week) throw new Error('Week unavailable');
+    renderBalances({ pairs: past.pairs, target: historyBalances, name: '', archived: true });
+  } catch {
+    if (request.signal.aborted || weekInput.value !== week) return;
+    historyBalances.innerHTML = '<p class="empty" role="status">Could not load this week. Choose it again to retry.</p>';
+    weekInput.value = '';
+  }
 });
 
 dayInput.addEventListener('change', () => {
