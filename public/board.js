@@ -6,6 +6,8 @@ const confirmPlayer = $('confirm-player');
 const weekInput = $('week');
 const historyBalances = $('history-balances');
 const dayInput = $('game-day');
+const statementView = document.documentElement.classList.contains('statement-view');
+const statementChart = $('statement-chart');
 const time = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit',
 });
@@ -253,10 +255,82 @@ function renderSettlements() {
     : '<p class="empty">No payments needed. Everyone is even.</p>';
 }
 
+function drawStatementChart() {
+  const trend = board?.standings.find(row => row.name === player)?.trend;
+  if (!trend?.length || !$('statement-trend').clientWidth) return;
+  const context = statementChart.getContext('2d');
+  if (!context) return;
+  const width = statementChart.clientWidth;
+  const height = statementChart.clientHeight;
+  const scale = window.devicePixelRatio || 1;
+  statementChart.width = Math.round(width * scale);
+  statementChart.height = Math.round(height * scale);
+  context.scale(scale, scale);
+
+  const dayTime = day => Date.parse(day + 'T00:00:00Z');
+  const firstDay = dayTime(trend[0].day) - 86400000;
+  const last = trend.at(-1);
+  const duration = dayTime(last.day) - firstDay;
+  const totals = trend.map(point => point.total);
+  const min = Math.min(0, ...totals);
+  const max = Math.max(0, ...totals);
+  const x = day => 6 + (dayTime(day) - firstDay) / duration * (width - 12);
+  const y = total => min === max ? height / 2 : 8 + (max - total) / (max - min) * (height - 16);
+  const colors = getComputedStyle(statementChart);
+
+  context.strokeStyle = colors.getPropertyValue('--border').trim();
+  context.setLineDash([3, 5]);
+  context.beginPath();
+  context.moveTo(0, y(0));
+  context.lineTo(width, y(0));
+  context.stroke();
+
+  const color = colors.getPropertyValue(last.total < 0 ? '--red' : last.total > 0 ? '--green' : '--muted').trim();
+  context.strokeStyle = context.fillStyle = color;
+  context.setLineDash([]);
+  context.lineWidth = 2;
+  context.lineJoin = 'round';
+  context.beginPath();
+  context.moveTo(6, y(0));
+  let previous = 0;
+  for (const point of trend) {
+    context.lineTo(x(point.day), y(previous));
+    context.lineTo(x(point.day), y(point.total));
+    previous = point.total;
+  }
+  context.stroke();
+  context.beginPath();
+  context.arc(x(last.day), y(last.total), 3.5, 0, Math.PI * 2);
+  context.fill();
+}
+
+function renderStatement() {
+  const row = board.standings.find(item => item.name === player);
+  if (!row) return;
+  $('statement-summary').hidden = false;
+  for (const [id, value] of [['statement-settled', row.settled], ['statement-live', row.live]]) {
+    const amount = $(id);
+    amount.textContent = signedMoney(value);
+    amount.className = 'points ' + pointClass(value) + (id === 'statement-settled' ? ' statement-value' : '');
+  }
+  const trend = row.trend ?? [];
+  $('statement-trend').hidden = !trend.length;
+  if (!trend.length) return;
+  $('statement-to').textContent = formatDay(trend.at(-1).day, shortDate);
+  statementChart.setAttribute('aria-label', 'Settled balance by game date: '
+    + trend.map(point => formatDay(point.day, shortDate) + ' ' + signedMoney(point.total)).join(', '));
+  drawStatementChart();
+}
+
+if (statementView && typeof ResizeObserver === 'function') {
+  new ResizeObserver(drawStatementChart).observe($('statement-trend'));
+}
+
 function render({ force = false } = {}) {
   refreshStatus();
   if (!board) return;
-  const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs, saving]);
+  const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs,
+    statementView ? board.standings : null, saving]);
   if (!force && signature === lastRender) return;
   lastRender = signature;
 
@@ -271,6 +345,7 @@ function render({ force = false } = {}) {
   renderBalances();
   renderGames();
   renderSettlements();
+  if (statementView) renderStatement();
   $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th><th scope="col">Owed net</th>'
     + '<th scope="col">Live net</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
     + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signedMoney(row.settled)
@@ -300,7 +375,8 @@ async function load() {
   if (updating) return updating;
   updating = (async () => {
     try {
-      const next = await readResponse(await fetch('/api/board', { cache: 'no-store' }));
+      const url = statementView ? '/api/board?view=statement' : '/api/board';
+      const next = await readResponse(await fetch(url, { cache: 'no-store' }));
       board = next;
       loadError = '';
       render();

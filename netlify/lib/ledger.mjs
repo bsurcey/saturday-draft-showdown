@@ -50,9 +50,10 @@ export function gameView(entry, games) {
     ?? { ...entry.game, state: 'unknown', detail: 'Score update unavailable' };
 }
 
-export function summarize(entries, games, week) {
+export function summarize(entries, games, week, { includeTrend = false } = {}) {
   const pairs = [];
   const standings = Object.fromEntries(players.map(name => [name, { name, settled: 0, live: 0 }]));
+  const changesByPlayer = includeTrend ? Object.fromEntries(players.map(name => [name, new Map()])) : null;
   players.forEach((first, i) => {
     players.slice(i + 1).forEach(second => {
       const pair = { first, second, starting: 0, week: 0, settled: 0, live: 0, games: [] };
@@ -64,6 +65,13 @@ export function summarize(entries, games, week) {
         const points = !outcome || outcome === 'push' ? 0 : outcome === entry.picks[first] ? stake : -stake;
         if (entry.final && entry.week < week) pair.starting += points;
         if (entry.final && entry.week === week) pair.week += points;
+        if (changesByPlayer && entry.final && outcome) {
+          const day = game.day ?? dayOf(game.start);
+          const firstChanges = changesByPlayer[first];
+          const secondChanges = changesByPlayer[second];
+          firstChanges.set(day, (firstChanges.get(day) ?? 0) + points);
+          secondChanges.set(day, (secondChanges.get(day) ?? 0) - points);
+        }
         if (!entry.final && outcome) pair.live += points;
         if (entry.week === week || !entry.final) {
           pair.games.push({
@@ -82,5 +90,14 @@ export function summarize(entries, games, week) {
       standings[second].live -= pair.live;
     });
   });
+  if (changesByPlayer) {
+    for (const [name, changes] of Object.entries(changesByPlayer)) {
+      let total = 0;
+      standings[name].trend = [...changes.keys()].sort().map(day => {
+        total += changes.get(day);
+        return { day, total };
+      });
+    }
+  }
   return { pairs, standings: Object.values(standings).sort((a, b) => b.live - a.live || a.name.localeCompare(b.name)) };
 }

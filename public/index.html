@@ -17,7 +17,13 @@
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
   <link rel="stylesheet" href="/board.css?v=14">
-  <script type="module" src="/board.js?v=11"></script>
+  <link rel="stylesheet" href="/statement.css?v=1">
+  <script>
+    if (new URLSearchParams(location.search).get('view') === 'statement') {
+      document.documentElement.classList.add('statement-view');
+    }
+  </script>
+  <script type="module" src="/board.js?v=12"></script>
 </head>
 <body>
   <header class="masthead">
@@ -50,23 +56,38 @@
     </form>
   </dialog>
   <main id="board-content" hidden>
-    <div class="overview">
-      <div>
-        <h1 class="ledger-title">The Ledger</h1>
-        <p>Running balances through Dec 31</p>
+    <section class="statement-summary" id="statement-summary" aria-labelledby="statement-title" hidden>
+      <div class="statement-totals">
+        <h1 id="statement-title">Your balance</h1>
+        <p class="statement-value" id="statement-settled">…</p>
+        <p class="statement-caption">From completed games</p>
+        <p class="statement-live"><strong id="statement-live">…</strong> if games ended now</p>
       </div>
-    </div>
-
-    <p id="notice" role="status" hidden></p>
-    <section class="balance-panel" aria-label="Head-to-head balances">
-      <div class="panel-toolbar">
-        <div class="segments" role="group" aria-label="Balance view">
-          <button type="button" data-scope="mine" aria-controls="balances" aria-pressed="true">My balances</button>
-          <button type="button" data-scope="group" aria-controls="balances" aria-pressed="false">Group balances</button>
+      <figure class="statement-trend" id="statement-trend" hidden>
+        <figcaption id="statement-chart-caption">Settled balance by game date</figcaption>
+        <canvas id="statement-chart" role="img"></canvas>
+        <div class="statement-axis"><span>Start</span><span id="statement-to"></span></div>
+      </figure>
+    </section>
+    <div class="ledger-section">
+      <div class="overview">
+        <div>
+          <h1 class="ledger-title">The Ledger</h1>
+          <p>Running balances through Dec 31</p>
         </div>
       </div>
-      <div id="balances" aria-busy="true"><p class="empty">Loading balances…</p></div>
-    </section>
+
+      <p id="notice" role="status" hidden></p>
+      <section class="balance-panel" aria-label="Head-to-head balances">
+        <div class="panel-toolbar">
+          <div class="segments" role="group" aria-label="Balance view">
+            <button type="button" data-scope="mine" aria-controls="balances" aria-pressed="true">My balances</button>
+            <button type="button" data-scope="group" aria-controls="balances" aria-pressed="false">Group balances</button>
+          </div>
+        </div>
+        <div id="balances" aria-busy="true"><p class="empty">Loading balances…</p></div>
+      </section>
+    </div>
 
     <section class="matchups" aria-labelledby="matchups-heading">
       <div class="overview">
@@ -119,6 +140,7 @@
   </main>
   <footer id="board-footer" hidden>
     <a href="/draft-archive.html">Original Fripp football tracker</a>
+    <a class="statement-classic" href="/">Fripp Classic</a>
     <span>Scores and spreads via ESPN</span>
   </footer>
 </body>

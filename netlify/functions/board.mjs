@@ -90,7 +90,8 @@ async function readBoard(request, store, now) {
   const today = dayOf(now);
   const displayDay = slateDay(now);
   const yesterday = shiftDay(today, -1);
-  const requestWeek = new URL(request.url).searchParams.get('week');
+  const params = new URL(request.url).searchParams;
+  const requestWeek = params.get('week');
   const todayFeeds = [];
   if (yesterday < currentWeek) {
     for (const league of Object.keys(leagues)) todayFeeds.push({ day: yesterday, league });
@@ -157,7 +158,7 @@ async function readBoard(request, store, now) {
     .map(item => item.league))];
   return json({
     week, currentWeek, today, displayDay, history, games, players, stake, errors, updatedAt: new Date().toISOString(),
-    ...summarize(entries, feedGames, week),
+    ...summarize(entries, feedGames, week, { includeTrend: params.get('view') === 'statement' }),
   });
 }
 
