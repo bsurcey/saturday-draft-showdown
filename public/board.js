@@ -115,12 +115,19 @@ function renderTeam(game, side, editable, picked) {
     + '" aria-pressed="' + (picked === side) + '"' + (saving ? ' disabled' : '') + '>' + content + '</button>';
 }
 
+function opponentCount(picks, name) {
+  const side = picks?.[name];
+  if (!side) return 0;
+  const opposite = side === 'home' ? 'away' : 'home';
+  return Object.values(picks).filter(pick => pick === opposite).length;
+}
+
 function renderGame(game) {
   const picked = game.picks?.[player];
   const open = game.timeKnown && game.state === 'pre' && Date.parse(game.start) > Date.now()
     && board.currentWeek === board.week;
   const editable = !!player && open && game.homeLine !== null;
-  const opponents = picked ? Object.values(game.picks).filter(pick => pick !== picked).length : 0;
+  const opponents = opponentCount(game.picks, player);
   let state = game.detail;
   if (game.state === 'pre') state = game.timeKnown ? time.format(new Date(game.start)) + ' CT' : 'Time TBD';
   if (game.state === 'live') state = state || 'Live';
@@ -143,7 +150,7 @@ function renderGames() {
   $('game-filters').hidden = myGames;
   let matches;
   if (myGames) {
-    matches = board.games.filter(game => game.picks?.[player]);
+    matches = board.games.filter(game => opponentCount(game.picks, player) > 0);
   } else {
     const leagueGames = board.games.filter(game => activeLeague === 'all' || game.league === activeLeague);
     const days = [...new Set(leagueGames.map(game => game.day))].sort();
@@ -157,7 +164,7 @@ function renderGames() {
   const groups = Map.groupBy(matches, game => game.day);
   $('games').innerHTML = [...groups].map(([day, games]) => '<h3 class="game-day-title">' + formatDay(day)
     + '</h3><div class="game-grid">' + games.map(renderGame).join('') + '</div>').join('')
-    || (myGames ? '<p class="empty">You have no saved picks for this week.</p>'
+    || (myGames ? '<p class="empty">None of your picks have an opponent this week.</p>'
       : '<p class="empty">No matchups on this board yet.</p>');
 }
 
