@@ -8,7 +8,7 @@
   <title>Fripp Island Pick Board</title>
   <link rel="icon" type="image/svg+xml" sizes="any" href="/favicon.svg">
   <link rel="stylesheet" href="/board.css?v=3">
-  <script type="module" src="/board.js?v=3"></script>
+  <script type="module" src="/board.js?v=4"></script>
 </head>
 <body>
   <header class="masthead">
@@ -64,10 +64,14 @@
           <h2 id="matchups-heading">Pick your sides</h2>
           <p>20 points per opponent on the other side.</p>
         </div>
+        <div class="segments" role="group" aria-label="Game view">
+          <button type="button" data-game-view="all" aria-controls="games" aria-pressed="true">All Games</button>
+          <button type="button" data-game-view="mine" aria-controls="games" aria-pressed="false">My Games</button>
+        </div>
       </div>
-      <div class="filters">
+      <div class="filters" id="game-filters">
         <div class="segments" aria-label="Sport">
-          <button type="button" data-league="all" aria-pressed="true">All games</button>
+          <button type="button" data-league="all" aria-pressed="true">All sports</button>
           <button type="button" data-league="ncaaf" aria-pressed="false">College football</button>
           <button type="button" data-league="ncaam" aria-pressed="false">College basketball</button>
           <button type="button" data-league="nfl" aria-pressed="false">NFL</button>

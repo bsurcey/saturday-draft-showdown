@@ -25,6 +25,7 @@ const pointClass = n => n > 0 ? 'positive' : n < 0 ? 'negative' : 'neutral';
 let board;
 let player;
 let activeScope = 'mine';
+let activeGameView = 'all';
 let activeLeague = 'all';
 let activeDay;
 let updating;
@@ -138,17 +139,26 @@ function renderGame(game) {
 }
 
 function renderGames() {
-  const matches = board.games.filter(game => activeLeague === 'all' || game.league === activeLeague);
-  const days = [...new Set(matches.map(game => game.day))].sort();
-  if (!activeDay) activeDay = days.includes(board.today) ? board.today : 'all';
-  if (!days.includes(activeDay) && activeDay !== 'all') activeDay = 'all';
-  dayInput.innerHTML = '<option value="all">All days</option>' + days.map(day =>
-    '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
-  dayInput.value = activeDay;
-  const groups = Map.groupBy(matches.filter(game => activeDay === 'all' || game.day === activeDay), game => game.day);
+  const myGames = activeGameView === 'mine';
+  $('game-filters').hidden = myGames;
+  let matches;
+  if (myGames) {
+    matches = board.games.filter(game => game.picks?.[player]);
+  } else {
+    const leagueGames = board.games.filter(game => activeLeague === 'all' || game.league === activeLeague);
+    const days = [...new Set(leagueGames.map(game => game.day))].sort();
+    if (!activeDay) activeDay = days.includes(board.today) ? board.today : 'all';
+    if (!days.includes(activeDay) && activeDay !== 'all') activeDay = 'all';
+    dayInput.innerHTML = '<option value="all">All days</option>' + days.map(day =>
+      '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
+    dayInput.value = activeDay;
+    matches = leagueGames.filter(game => activeDay === 'all' || game.day === activeDay);
+  }
+  const groups = Map.groupBy(matches, game => game.day);
   $('games').innerHTML = [...groups].map(([day, games]) => '<h3 class="game-day-title">' + formatDay(day)
     + '</h3><div class="game-grid">' + games.map(renderGame).join('') + '</div>').join('')
-    || '<p class="empty">No matchups on this board yet.</p>';
+    || (myGames ? '<p class="empty">You have no saved picks for this week.</p>'
+      : '<p class="empty">No matchups on this board yet.</p>');
 }
 
 function render({ force = false } = {}) {
@@ -321,7 +331,7 @@ dayInput.addEventListener('change', () => {
 document.addEventListener('click', event => {
   const button = event.target.closest('button');
   if (!button) return;
-  const { scope, league } = button.dataset;
+  const { scope, league, gameView } = button.dataset;
   if (scope) {
     activeScope = scope;
     setSegment('[data-scope]', 'scope', scope);
@@ -330,6 +340,11 @@ document.addEventListener('click', event => {
   if (league) {
     activeLeague = league;
     setSegment('[data-league]', 'league', league);
+    if (board) renderGames();
+  }
+  if (gameView) {
+    activeGameView = gameView;
+    setSegment('[data-game-view]', 'gameView', gameView);
     if (board) renderGames();
   }
 });
