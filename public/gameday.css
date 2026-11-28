@@ -73,7 +73,7 @@
 .gameday-view .balance-row > :not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
 .gameday-view .rank-table td, .gameday-view .rank-table th:not(:first-child) { text-align: right; }
 .gameday-view .board-panel-heading { padding-block: 14px; }
-.gameday-view #past-weeks .panel-toolbar { padding-inline: 16px; }
+.gameday-view #betting-history .history-intro { padding-inline: 16px; }
 
 .gameday-view .filters { margin-bottom: 16px; }
 .gameday-view .game-day-title {

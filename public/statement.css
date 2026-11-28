@@ -117,7 +117,7 @@
 
 @media (min-width: 900px) {
   .statement-view main { grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr); column-gap: 48px; }
-  .statement-view .statement-summary, .statement-view #past-weeks { grid-column: 1 / -1; }
+  .statement-view .statement-summary, .statement-view #betting-history { grid-column: 1 / -1; }
   .statement-view .ledger-section { grid-column: 2; grid-row: 2; }
   .statement-view .matchups { grid-column: 1; grid-row: 2; }
 }

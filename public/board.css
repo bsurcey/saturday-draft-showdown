@@ -136,6 +136,19 @@ button.team:enabled:hover { border-color: #aa5209; }
 .settlement-list { margin: 0; padding: 0; list-style: none; }
 .settlement-list li { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 13px 17px; border-top: 1px solid var(--border); }
 .settlement-list .points { white-space: nowrap; }
+.history-intro { padding: 0 17px 14px; color: var(--muted); font-size: .85rem; border-bottom: 1px solid var(--border); }
+.history-total, .history-day-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.history-total { padding: 14px 17px; font-size: .95rem; }
+.history-total strong { font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.history-day { border-top: 1px solid var(--border); }
+.history-day-heading { padding: 10px 17px; color: var(--muted); font-size: .8rem; }
+.history-day-heading strong { color: var(--ink); font-size: .9rem; }
+.history-day ul { margin: 0; padding: 0; list-style: none; }
+.history-transaction { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 12px 17px; border-top: 1px solid var(--border); }
+.history-transaction > div { display: grid; gap: 3px; }
+.history-pick { font-size: .95rem; }
+.history-transaction span { color: var(--muted); font-size: .78rem; line-height: 1.35; }
+.history-amount { justify-items: end; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 2px 0 25px; color: var(--muted); font-size: .8rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 850px) { .game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -167,5 +180,7 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
   .sport-filter button { min-height: 40px; padding: 7px 6px; }
   .sport-full { display: none; }
   .sport-short { display: inline; }
+  .history-transaction { padding-inline: 12px; gap: 8px; }
+  .history-day-heading, .history-total { padding-inline: 12px; }
   .game-grid { grid-template-columns: 1fr; }
 }

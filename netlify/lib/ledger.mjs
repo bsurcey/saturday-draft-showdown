@@ -94,6 +94,32 @@ export function groupStats(entries, games) {
   return { totalWagers, totalDollars: totalWagers * stake, players: Object.values(stats) };
 }
 
+export function transactionHistory(entries, games) {
+  const transactions = [];
+  for (const entry of entries) {
+    if (!entry.final) continue;
+    const game = gameView(entry, games);
+    const outcome = result(game, entry.line);
+    if (!outcome) continue;
+    const homePlayers = Object.entries(entry.picks ?? {})
+      .filter(([name, side]) => players.includes(name) && side === 'home').map(([name]) => name);
+    const awayPlayers = Object.entries(entry.picks ?? {})
+      .filter(([name, side]) => players.includes(name) && side === 'away').map(([name]) => name);
+    const homeAmount = outcome === 'push' ? 0 : outcome === 'home' ? stake : -stake;
+    for (const homePlayer of homePlayers) {
+      for (const awayPlayer of awayPlayers) {
+        transactions.push({
+          id: `${game.id}:${homePlayer}:${awayPlayer}`,
+          league: game.id.split(':')[0], start: game.start, day: game.day ?? dayOf(game.start),
+          away: game.away.abbr, home: game.home.abbr, line: entry.line,
+          homePlayer, awayPlayer, homeAmount,
+        });
+      }
+    }
+  }
+  return transactions.sort((a, b) => a.start.localeCompare(b.start) || a.id.localeCompare(b.id));
+}
+
 export function summarize(entries, games, week, { includeTrend = false } = {}) {
   const pairs = [];
   const standings = Object.fromEntries(players.map(name => [name, { name, settled: 0, live: 0 }]));
