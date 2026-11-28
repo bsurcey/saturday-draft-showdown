@@ -46,7 +46,9 @@ async function savePick(request, store, deviceStore, now) {
   const currentWeek = weekOf(now);
   const today = dayOf(now);
   const day = body.day;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < today || day > shiftDay(currentWeek, 6)) {
+  const windowEnd = shiftDay(today, 2);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || day < today
+    || (day > shiftDay(currentWeek, 6) && day > windowEnd)) {
     throw fail('Picks are closed for this matchup.', 409);
   }
   const league = body.id.split(':')[0];
@@ -89,15 +91,15 @@ async function readBoard(request, store, now) {
   const currentWeek = weekOf(now);
   const today = dayOf(now);
   const displayDay = slateDay(now);
-  const yesterday = shiftDay(today, -1);
+  const firstSlateDay = shiftDay(today, -2);
+  const lastSlateDay = shiftDay(today, 2);
+  const firstFeedDay = firstSlateDay < currentWeek ? firstSlateDay : currentWeek;
+  const weekEnd = shiftDay(currentWeek, 6);
+  const lastFeedDay = lastSlateDay > weekEnd ? lastSlateDay : weekEnd;
   const params = new URL(request.url).searchParams;
   const requestWeek = params.get('week');
   const todayFeeds = [];
-  if (yesterday < currentWeek) {
-    for (const league of Object.keys(leagues)) todayFeeds.push({ day: yesterday, league });
-  }
-  for (let i = 0; i < 7; i++) {
-    const day = shiftDay(currentWeek, i);
+  for (let day = firstFeedDay; day <= lastFeedDay; day = shiftDay(day, 1)) {
     for (const league of Object.keys(leagues)) todayFeeds.push({ day, league });
   }
   const [previous, feeds] = await Promise.all([
@@ -136,13 +138,13 @@ async function readBoard(request, store, now) {
   const history = [...new Set(entries.map(entry => entry.week).concat(currentWeek))].sort().reverse();
   const week = history.includes(requestWeek) ? requestWeek : currentWeek;
   const board = new Map(week === currentWeek ? featured([...feedGames.values()]
-    .filter(game => game.day >= (yesterday < week ? yesterday : week) && game.day <= shiftDay(week, 6)))
+    .filter(game => game.day >= firstFeedDay && game.day <= lastFeedDay))
     .map(game => [game.id, game]) : []);
 
   for (const entry of entries) {
     const game = gameView(entry, feedGames);
     const carriesOver = week === currentWeek && (
-      board.has(game.id) || game.day === yesterday
+      board.has(game.id) || (game.day >= firstSlateDay && game.day <= lastSlateDay)
       || (!entry.final && game.state === 'live' && game.day < today)
     );
     if (entry.week !== week && !carriesOver) continue;

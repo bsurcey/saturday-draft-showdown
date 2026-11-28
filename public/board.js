@@ -21,6 +21,12 @@ const shortDate = new Intl.DateTimeFormat('en-US', {
 });
 const formatDay = (day, formatter = dateLabel) => formatter.format(new Date(day + 'T00:00:00Z'));
 
+function shiftDay(day, offset) {
+  const date = new Date(day + 'T00:00:00Z');
+  date.setUTCDate(date.getUTCDate() + offset);
+  return date.toISOString().slice(0, 10);
+}
+
 function localGameDay(game) {
   if (!game.timeKnown) return game.day;
   const date = new Date(game.start);
@@ -41,7 +47,7 @@ let board;
 let player;
 let activeScope = 'mine';
 let activeLeague = 'all';
-let activeDay = 'auto';
+let activeDay;
 let updating;
 let saving = false;
 let saveError = '';
@@ -209,20 +215,12 @@ function renderGame(game) {
 function renderGames() {
   const leagueGames = board.games.filter(game => belongsOnActiveBoard(game)
     && (activeLeague === 'all' || game.league === activeLeague));
-  const days = [...new Set(leagueGames.map(localGameDay))].sort();
-  const displayDay = board.displayDay ?? board.today;
-  const automatic = activeDay === 'auto';
-  const selectedDay = automatic ? displayDay : activeDay;
-  if (!automatic && activeDay !== 'all' && !days.includes(activeDay)) {
-    days.push(activeDay);
-    days.sort();
-  }
-  dayInput.innerHTML = '<option value="auto">Auto · ' + formatDay(displayDay) + '</option>'
-    + '<option value="all">All days</option>' + days.map(day =>
-    '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
-  dayInput.value = activeDay;
-  const matches = leagueGames.filter(game => selectedDay === 'all' || localGameDay(game) === selectedDay
-    || (automatic && game.state === 'live' && localGameDay(game) < selectedDay));
+  const days = [-2, -1, 0, 1, 2].map(offset => shiftDay(board.today, offset));
+  if (!days.includes(activeDay)) activeDay = undefined;
+  const selectedDay = activeDay ?? board.today;
+  dayInput.replaceChildren(...days.map(day => new Option(formatDay(day), day)));
+  dayInput.value = selectedDay;
+  const matches = leagueGames.filter(game => localGameDay(game) === selectedDay);
   const groups = Map.groupBy(matches, localGameDay);
   $('games').innerHTML = [...groups].map(([day, games]) => '<h3 class="game-day-title">' + formatDay(day)
     + '</h3><div class="game-grid">' + games.map(renderGame).join('') + '</div>').join('')
@@ -406,7 +404,7 @@ if (statementView && typeof ResizeObserver === 'function') {
 function render({ force = false } = {}) {
   refreshStatus();
   if (!board) return;
-  const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs, board.groupStats,
+  const signature = JSON.stringify([board.week, board.today, board.history, board.games, board.pairs, board.groupStats,
     statementView || investView ? board.standings : null, saving]);
   if (!force && signature === lastRender) return;
   lastRender = signature;
@@ -583,7 +581,7 @@ weekInput.addEventListener('change', async () => {
 });
 
 dayInput.addEventListener('change', () => {
-  activeDay = dayInput.value;
+  activeDay = dayInput.value === board?.today ? undefined : dayInput.value;
   if (board) renderGames();
 });
 
