@@ -8,6 +8,7 @@ const historyBalances = $('history-balances');
 const dayInput = $('game-day');
 const statementView = document.documentElement.classList.contains('statement-view');
 const investView = document.documentElement.classList.contains('invest-view');
+const projectedBalanceLabel = investView ? 'If scores hold' : 'Live net';
 const statementChart = $('statement-chart');
 const time = new Intl.DateTimeFormat('en-US', {
   timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit',
@@ -102,7 +103,7 @@ function renderBalances({ pairs = board.pairs, target = $('balances'), name = ac
   }).join('');
   target.innerHTML = '<div class="balance-head"><span>Players</span>'
     + (archived ? '<span>Settled total</span><span>Week’s results</span>'
-      : '<span>Owed now</span><span>' + (investView ? 'If scores hold' : 'Live net') + '</span>')
+      : '<span>Owed now</span><span>' + projectedBalanceLabel + '</span>')
     + '</div>' + rows;
 }
 
@@ -351,7 +352,7 @@ function render({ force = false } = {}) {
   renderSettlements();
   if (statementView || investView) renderBalanceSummary();
   $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th><th scope="col">Owed net</th>'
-    + '<th scope="col">Live net</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
+    + '<th scope="col">' + projectedBalanceLabel + '</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
     + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signedMoney(row.settled)
     + '</td><td class="points ' + pointClass(row.live) + '">' + signedMoney(row.live) + '</td></tr>').join('')
     + '</tbody></table>';
