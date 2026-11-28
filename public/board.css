@@ -148,7 +148,7 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
   .identity { gap: 5px; font-size: .75rem; }
   .identity::after { content: "·"; margin-left: 1px; color: #adb4ba; }
   .identity strong { font-size: .75rem; }
-  .brand { font-size: .875rem; }
+  .brand { font-size: .875rem; white-space: normal; }
   .brand-logo { width: 43px; height: 43px; }
   .week-selector span { display: none; }
   .overview { align-items: flex-end; gap: 6px; }
