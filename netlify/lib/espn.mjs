@@ -48,18 +48,20 @@ function homeSpread(competition) {
   return null;
 }
 
-function normalizeTeam(competitor) {
+function normalizeTeam(competitor, divisionOneTeams) {
   const team = competitor.team ?? {};
+  const id = String(team.id ?? competitor.id);
   const rank = Number(competitor.curatedRank?.current);
   const logo = /^[a-z0-9:/_.-]+$/i.test(team.logo ?? '') && team.logo?.startsWith('https://a.espncdn.com/')
     ? team.logo : '';
   return {
-    id: String(team.id ?? competitor.id),
+    id,
     name: team.shortDisplayName ?? team.displayName ?? competitor.id,
     abbr: team.abbreviation ?? team.shortDisplayName ?? competitor.id,
     logo,
     rank: rank > 0 && rank <= 25 ? rank : null,
     score: parseLine(competitor.score),
+    ...(divisionOneTeams && { divisionOne: divisionOneTeams.has(id) }),
   };
 }
 
@@ -77,7 +79,7 @@ function broadcastNetworks(competition) {
   return [...unique.values()];
 }
 
-function normalize(league, id, competition, status) {
+function normalize(league, id, competition, status, divisionOneTeams) {
   const home = competition?.competitors?.find(team => team.homeAway === 'home');
   const away = competition?.competitors?.find(team => team.homeAway === 'away');
   const start = competition?.date;
@@ -93,7 +95,7 @@ function normalize(league, id, competition, status) {
     id: league + ':' + id, league, start, day: dayOf(start),
     state, detail: type?.shortDetail ?? type?.detail ?? '',
     homeLine: homeSpread(competition),
-    home: normalizeTeam(home), away: normalizeTeam(away),
+    home: normalizeTeam(home, divisionOneTeams), away: normalizeTeam(away, divisionOneTeams),
     timeKnown: competition.timeValid !== false && !/TBD|TBA/i.test(type?.detail ?? ''),
     networks: broadcastNetworks(competition),
   };
@@ -122,15 +124,27 @@ async function load(key, url, ttl, normalizeResponse) {
   return entry.promise;
 }
 
+function basketballDivisionOneTeams() {
+  const { path, group } = leagues.ncaam;
+  const query = new URLSearchParams({ groups: String(group), limit: '500' });
+  return load('ncaam/teams', base + '/' + path + '/teams?' + query, 86400000, data => {
+    const teams = data.sports?.[0]?.leagues?.[0]?.teams;
+    if (!Array.isArray(teams) || !teams.length) throw new Error('ESPN teams list was incomplete');
+    return new Set(teams.map(({ team }) => String(team.id)));
+  });
+}
+
 export function scoreboard(league, day, today = dayOf(Date.now())) {
   const { path, group } = leagues[league];
   const query = new URLSearchParams({ dates: day.replaceAll('-', ''), limit: '250' });
   if (group) query.set('groups', String(group));
   const nearby = day >= shiftDay(today, -1) && day <= shiftDay(today, 1);
   return load(league + '/' + day, base + '/' + path + '/scoreboard?' + query,
-    nearby ? 18000 : 180000, data => {
+    nearby ? 18000 : 180000, async data => {
       if (!Array.isArray(data.events)) throw new Error('ESPN scoreboard was incomplete');
-      return data.events.map(event => normalize(league, event.id, event.competitions?.[0], event.status)).filter(Boolean);
+      const divisionOneTeams = league === 'ncaam' ? await basketballDivisionOneTeams().catch(() => null) : null;
+      return data.events.map(event => normalize(league, event.id, event.competitions?.[0], event.status, divisionOneTeams))
+        .filter(Boolean);
     });
 }
 
@@ -146,9 +160,14 @@ const nationalBasketballNetworks = new Set([
 ]);
 
 function isFeaturedBasketball(game) {
-  return Boolean(game.home.rank || game.away.rank)
-    || (Number.isFinite(game.homeLine) && Math.abs(game.homeLine) <= 10
-      && game.networks.some(network => nationalBasketballNetworks.has(network.toUpperCase())));
+  const { home, away, homeLine, networks } = game;
+  if (home.rank && away.rank) return true;
+  if (home.rank || away.rank) {
+    const opponent = home.rank ? away : home;
+    return opponent.divisionOne === true && (homeLine === null || Math.abs(homeLine) <= 20);
+  }
+  return Number.isFinite(homeLine) && Math.abs(homeLine) <= 10
+    && networks.some(network => nationalBasketballNetworks.has(network.toUpperCase()));
 }
 
 export function featured(games) {
