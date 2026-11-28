@@ -140,16 +140,30 @@ export function summary(game) {
     45000, data => normalize(game.league, id, data.header?.competitions?.[0], data.header?.competitions?.[0]?.status));
 }
 
+const nationalBasketballNetworks = new Set([
+  'ABC', 'CBS', 'FOX', 'NBC', 'ESPN', 'ESPN2', 'ESPNU',
+  'FS1', 'FS2', 'CBS SPORTS NETWORK', 'CBSSN', 'TNT', 'TBS', 'TRUTV',
+]);
+
+function isFeaturedBasketball(game) {
+  return Boolean(game.home.rank || game.away.rank)
+    || (Number.isFinite(game.homeLine) && Math.abs(game.homeLine) <= 10
+      && game.networks.some(network => nationalBasketballNetworks.has(network.toUpperCase())));
+}
+
 export function featured(games) {
   const groups = Map.groupBy(games, game => game.league + '/' + game.day);
   return [...groups.values()].flatMap(group => {
-    const limit = leagues[group[0].league].limit;
-    return group.sort((a, b) => {
+    const league = group[0].league;
+    const candidates = league === 'ncaam' ? group.filter(isFeaturedBasketball) : group;
+    const picks = candidates.sort((a, b) => {
       const rank = game => (game.away.rank ? 50 - game.away.rank : 0) + (game.home.rank ? 50 - game.home.rank : 0);
       return rank(b) - rank(a)
         || Number(b.homeLine !== null) - Number(a.homeLine !== null)
         || Math.abs(a.homeLine ?? 999) - Math.abs(b.homeLine ?? 999)
         || a.start.localeCompare(b.start);
-    }).filter((game, position) => position < limit || hasFollowedTeam(game));
+    }).slice(0, leagues[league].limit);
+    const included = new Set(picks);
+    return [...picks, ...group.filter(game => !included.has(game) && hasFollowedTeam(game))];
   });
 }
