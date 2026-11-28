@@ -11,7 +11,7 @@ const investView = document.documentElement.classList.contains('invest-view');
 const projectedBalanceLabel = investView ? 'If scores hold' : 'Live net';
 const statementChart = $('statement-chart');
 const time = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit',
+  hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
 });
 const dateLabel = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric',
@@ -20,6 +20,15 @@ const shortDate = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC', month: 'short', day: 'numeric',
 });
 const formatDay = (day, formatter = dateLabel) => formatter.format(new Date(day + 'T00:00:00Z'));
+
+function localGameDay(game) {
+  if (!game.timeKnown) return game.day;
+  const date = new Date(game.start);
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 const text = value => String(value).replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[char]));
@@ -48,7 +57,7 @@ function weekLabel(day) {
 
 function refreshStatus() {
   const lastUpdated = board ? time.format(new Date(board.updatedAt)) : '';
-  $('refresh-label').textContent = loadError ? 'Reconnecting…' : lastUpdated ? 'Updated ' + lastUpdated + ' CT' : 'Connecting';
+  $('refresh-label').textContent = loadError ? 'Reconnecting…' : lastUpdated ? 'Updated ' + lastUpdated : 'Connecting';
   const feedIssue = board?.errors?.length
     ? 'Some ESPN scores or spreads are delayed. The board will retry automatically.' : '';
   const notice = saveError || loadError || feedIssue;
@@ -168,7 +177,7 @@ function renderGame(game) {
   const editable = !!player && open && game.homeLine !== null;
   const opponents = opponentCount(game.picks, player);
   let state = game.detail;
-  if (game.state === 'pre') state = game.timeKnown ? time.format(new Date(game.start)) + ' CT' : 'Time TBD';
+  if (game.state === 'pre') state = game.timeKnown ? time.format(new Date(game.start)) : 'Time TBD';
   if (game.state === 'live') state = state || 'Live';
   if (game.state === 'final') state = state || 'Final';
   if (game.state === 'void') state = state || 'Canceled';
@@ -193,7 +202,7 @@ function renderGames() {
   } else {
     const leagueGames = board.games.filter(game => belongsOnActiveBoard(game)
       && (activeLeague === 'all' || game.league === activeLeague));
-    const days = [...new Set(leagueGames.map(game => game.day))].sort();
+    const days = [...new Set(leagueGames.map(localGameDay))].sort();
     const displayDay = board.displayDay ?? board.today;
     const automatic = activeDay === 'auto';
     const defaultDay = days.includes(displayDay) ? displayDay : 'all';
@@ -207,10 +216,10 @@ function renderGames() {
       + '<option value="all">All days</option>' + days.map(day =>
       '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
     dayInput.value = activeDay;
-    matches = leagueGames.filter(game => selectedDay === 'all' || game.day === selectedDay
-      || (automatic && game.day < displayDay && game.state === 'live'));
+    matches = leagueGames.filter(game => selectedDay === 'all' || localGameDay(game) === selectedDay
+      || (automatic && game.state === 'live'));
   }
-  const groups = Map.groupBy(matches, game => game.day);
+  const groups = Map.groupBy(matches, localGameDay);
   $('games').innerHTML = [...groups].map(([day, games]) => '<h3 class="game-day-title">' + formatDay(day)
     + '</h3><div class="game-grid">' + games.map(renderGame).join('') + '</div>').join('')
     || (myGames ? '<p class="empty">None of your picks have an opponent this week.</p>'
