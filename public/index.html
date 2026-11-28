@@ -25,7 +25,7 @@
       document.documentElement.classList.add('statement-view');
     } else if (view === 'gameday') {
       document.documentElement.classList.add('gameday-view');
-    } else if (view === 'invest') {
+    } else if (view !== 'classic') {
       document.documentElement.classList.add('invest-view');
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
@@ -150,7 +150,7 @@
   </main>
   <footer id="board-footer" hidden>
     <a class="draft-archive-link" href="/draft-archive.html">Original Fripp football tracker</a>
-    <a class="statement-classic" href="/">Fripp Classic</a>
+    <a class="statement-classic" href="/?view=classic">Fripp Classic</a>
     <span>Scores and spreads via ESPN</span>
   </footer>
 </body>
