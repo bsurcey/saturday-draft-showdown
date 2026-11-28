@@ -6,6 +6,22 @@ export const leagues = {
   nfl: { path: 'football/nfl', limit: Infinity },
 };
 
+const followedTeams = {
+  ncaam: {
+    '2193': 'East Tennessee State',
+    '236': 'Chattanooga',
+  },
+  ncaaf: {
+    '2579': 'South Carolina',
+    '135': 'Minnesota',
+  },
+};
+
+export function hasFollowedTeam(game) {
+  const teams = followedTeams[game.league];
+  return !!teams && (Object.hasOwn(teams, game.home.id) || Object.hasOwn(teams, game.away.id));
+}
+
 const base = 'https://site.api.espn.com/apis/site/v2/sports';
 const cache = new Map();
 
@@ -125,12 +141,14 @@ export function summary(game) {
 
 export function featured(games) {
   const groups = Map.groupBy(games, game => game.league + '/' + game.day);
-  return [...groups.values()].flatMap(group => group
-    .sort((a, b) => {
+  return [...groups.values()].flatMap(group => {
+    const limit = leagues[group[0].league].limit;
+    return group.sort((a, b) => {
       const rank = game => (game.away.rank ? 50 - game.away.rank : 0) + (game.home.rank ? 50 - game.home.rank : 0);
       return rank(b) - rank(a)
         || Number(b.homeLine !== null) - Number(a.homeLine !== null)
         || Math.abs(a.homeLine ?? 999) - Math.abs(b.homeLine ?? 999)
         || a.start.localeCompare(b.start);
-    }).slice(0, leagues[group[0].league].limit));
+    }).filter((game, position) => position < limit || hasFollowedTeam(game));
+  });
 }

@@ -1,7 +1,7 @@
 import { getStore } from '@netlify/blobs';
 import { devicePlayer, deviceToken, openDevices } from '../lib/device.mjs';
 import { alignGame, dayOf, gameView, players, result, shiftDay, slateDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
-import { featured, leagues, scoreboard, summary } from '../lib/espn.mjs';
+import { featured, hasFollowedTeam, leagues, scoreboard, summary } from '../lib/espn.mjs';
 
 const key = 'games-v2';
 const isGameId = /^(ncaaf|ncaam|nfl):\d{1,15}$/;
@@ -153,7 +153,9 @@ async function readBoard(request, store, now) {
     });
   }
 
-  const games = [...board.values()].sort((a, b) => a.start.localeCompare(b.start));
+  const games = [...board.values()]
+    .map(game => hasFollowedTeam(game) ? { ...game, followed: true } : game)
+    .sort((a, b) => a.start.localeCompare(b.start));
   const errors = [...new Set(todayFeeds.filter((_, index) => feeds[index].status === 'rejected')
     .map(item => item.league))];
   return json({

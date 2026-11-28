@@ -155,6 +155,7 @@ function hasOpposingPicks(picks) {
 }
 
 function belongsOnActiveBoard(game) {
+  if (game.followed) return true;
   const hasStarted = game.state !== 'pre'
     || (game.timeKnown && Date.parse(game.start) <= Date.now());
   return !hasStarted || hasOpposingPicks(game.picks);
