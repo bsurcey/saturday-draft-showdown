@@ -51,6 +51,22 @@
   margin-left: 0;
 }
 .invest-view .identity::after { content: "·"; margin-left: 1px; color: inherit; }
+@media (width > 600px) {
+  .invest-view .header-inner {
+    grid-template-columns: 68px minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+  }
+  .invest-view .brand-logo { grid-area: 1 / 1; }
+  .invest-view .header-brand > div { align-self: center; }
+  .invest-view .header-status {
+    grid-area: 1 / 3;
+    align-self: center;
+    display: grid;
+    justify-items: end;
+    gap: 4px;
+  }
+  .invest-view .identity::after { content: none; }
+}
 .invest-view .identity, .invest-view .refresh-label { color: var(--muted); }
 .invest-view .season-note, .invest-view .ledger-cutoff, .invest-view .settlement-source { display: none; }
 .invest-view .invest-settlement-note { display: inline; }
