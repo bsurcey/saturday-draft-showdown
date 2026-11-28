@@ -28,7 +28,7 @@
 .invest-view .season-note, .invest-view .ledger-cutoff, .invest-view .settlement-source { display: none; }
 .invest-view .invest-settlement-note { display: inline; }
 .invest-view .identity strong { color: var(--ink); }
-.invest-view .statement-classic { display: inline; }
+.invest-view .draft-archive-link { display: none; }
 .invest-view :focus-visible { outline-color: var(--bright); }
 
 .invest-view .statement-summary {
