@@ -69,6 +69,9 @@
 .invest-view .balance-row:hover, .invest-view .balance-item[open] { background: #272113; }
 .invest-view .balance-head, .invest-view .balance-row, .invest-view .rank-table { font-variant-numeric: tabular-nums; }
 .invest-view .rank-table th, .invest-view .rank-table td { border-top-color: #35322d; }
+.invest-view .stats-grid, .invest-view .stat-card { border-color: #35322d; }
+.invest-view .stat-value { font-weight: 500; }
+.invest-view .stat-total .stat-value { color: var(--bright); font-size: 2.25rem; font-weight: 300; }
 .invest-view #notice { color: var(--ink); background: #302917; }
 .invest-view .player-dialog { background: var(--white); }
 

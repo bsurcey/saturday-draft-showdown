@@ -50,6 +50,50 @@ export function gameView(entry, games) {
     ?? { ...entry.game, state: 'unknown', detail: 'Score update unavailable' };
 }
 
+export function groupStats(entries, games) {
+  const stats = Object.fromEntries(players.map(name => [name, {
+    name, games: 0, underdogs: 0, underdogWins: 0, favorites: 0, favoriteWins: 0,
+    home: 0, homeWins: 0, road: 0, roadWins: 0,
+  }]));
+  let totalWagers = 0;
+
+  for (const entry of entries) {
+    const picks = Object.entries(entry.picks ?? {})
+      .filter(([name, side]) => stats[name] && ['home', 'away'].includes(side));
+    const home = picks.filter(([, side]) => side === 'home');
+    const away = picks.filter(([, side]) => side === 'away');
+    if (!home.length || !away.length) continue;
+
+    totalWagers += home.length * away.length;
+    const outcome = entry.final ? result(gameView(entry, games), entry.line) : null;
+
+    for (const [name, side] of picks) {
+      const row = stats[name];
+      const won = outcome && outcome !== 'push' && outcome === side;
+      row.games += 1;
+
+      if (side === 'home') {
+        row.home += 1;
+        if (won) row.homeWins += 1;
+      } else {
+        row.road += 1;
+        if (won) row.roadWins += 1;
+      }
+
+      const favorite = entry.line < 0 ? 'home' : entry.line > 0 ? 'away' : null;
+      if (side === favorite) {
+        row.favorites += 1;
+        if (won) row.favoriteWins += 1;
+      } else if (favorite) {
+        row.underdogs += 1;
+        if (won) row.underdogWins += 1;
+      }
+    }
+  }
+
+  return { totalWagers, totalDollars: totalWagers * stake, players: Object.values(stats) };
+}
+
 export function summarize(entries, games, week, { includeTrend = false } = {}) {
   const pairs = [];
   const standings = Object.fromEntries(players.map(name => [name, { name, settled: 0, live: 0 }]));

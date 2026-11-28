@@ -1,6 +1,6 @@
 import { getStore } from '@netlify/blobs';
 import { devicePlayer, deviceToken, openDevices } from '../lib/device.mjs';
-import { alignGame, dayOf, gameView, players, result, shiftDay, slateDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
+import { alignGame, dayOf, gameView, groupStats, players, result, shiftDay, slateDay, stake, summarize, weekOf } from '../lib/ledger.mjs';
 import { featured, hasFollowedTeam, leagues, scoreboard, summary } from '../lib/espn.mjs';
 
 const key = 'games-v2';
@@ -160,6 +160,7 @@ async function readBoard(request, store, now) {
     .map(item => item.league))];
   return json({
     week, currentWeek, today, displayDay, history, games, players, stake, errors, updatedAt: new Date().toISOString(),
+    groupStats: groupStats(entries, feedGames),
     ...summarize(entries, feedGames, week, { includeTrend: params.get('view') === 'statement' }),
   });
 }

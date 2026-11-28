@@ -22,7 +22,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/app-icon-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="/board.css?v=18">
+  <link rel="stylesheet" href="/board.css?v=19">
   <link rel="stylesheet" href="/statement.css?v=1">
   <link rel="stylesheet" href="/gameday.css?v=1">
   <script>
@@ -35,11 +35,11 @@
       document.documentElement.classList.add('invest-view');
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = '/invest.css?v=10';
+      stylesheet.href = '/invest.css?v=11';
       document.head.append(stylesheet);
     }
   </script>
-  <script type="module" src="/board.js?v=18"></script>
+  <script type="module" src="/board.js?v=19"></script>
 </head>
 <body>
   <header class="masthead">
@@ -136,6 +136,14 @@
         <h2 id="standings-heading">Overall Leaderboard</h2>
       </div>
       <div id="ranks"></div>
+    </section>
+
+    <section class="board-panel stats-panel" aria-labelledby="stats-heading">
+      <div class="board-panel-heading">
+        <h2 id="stats-heading">By the Numbers</h2>
+        <p>Every head-to-head wager since we started.</p>
+      </div>
+      <div class="stats-grid" id="group-stats"></div>
     </section>
 
     <section class="board-panel" aria-labelledby="settlement-heading">

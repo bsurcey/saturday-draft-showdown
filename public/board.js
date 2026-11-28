@@ -268,6 +268,65 @@ function renderSettlements() {
     : '<p class="empty">No payments needed. Everyone is even.</p>';
 }
 
+function namesLabel(rows) {
+  const names = rows.map(row => row.name);
+  if (names.length < 2) return names[0] ?? '';
+  if (names.length === 2) return names.join(' & ');
+  return names.slice(0, -1).join(', ') + ' & ' + names.at(-1);
+}
+
+function countLeader(rows, field, empty = 'No wins yet') {
+  const maximum = Math.max(0, ...rows.map(row => row[field]));
+  if (!maximum) return { value: empty, detail: '' };
+  const leaders = rows.filter(row => row[field] === maximum);
+  return { value: namesLabel(leaders), detail: maximum + ' ' + (maximum === 1 ? 'win' : 'wins') };
+}
+
+function percentageLeader(rows, field, empty) {
+  const eligible = rows.filter(row => row.games > 0);
+  if (!eligible.length) return { value: 'No bets yet', detail: '' };
+  const maximum = Math.max(...eligible.map(row => row[field] / row.games));
+  if (!maximum) return { value: empty, detail: '' };
+  const leaders = eligible.filter(row => Math.abs(row[field] / row.games - maximum) < Number.EPSILON);
+  const leader = leaders[0];
+  return {
+    value: namesLabel(leaders),
+    detail: Math.round(maximum * 100) + '%'
+      + (leaders.length === 1 ? ' · ' + leader[field] + ' of ' + leader.games + ' picks' : ' of their picks'),
+  };
+}
+
+function renderGroupStats() {
+  const stats = board.groupStats;
+  if (!stats) {
+    $('group-stats').innerHTML = '<p class="empty">Group stats will appear as picks face off.</p>';
+    return;
+  }
+  const rows = stats.players;
+  const maximumGames = Math.max(0, ...rows.map(row => row.games));
+  const mostGames = maximumGames ? {
+    value: namesLabel(rows.filter(row => row.games === maximumGames)),
+    detail: maximumGames + ' ' + (maximumGames === 1 ? 'game' : 'games'),
+  } : { value: 'No bets yet', detail: '' };
+  const cards = [
+    { label: 'Total bet by the group', value: '$' + stats.totalDollars.toLocaleString(),
+      detail: stats.totalWagers + ' head-to-head ' + (stats.totalWagers === 1 ? 'wager' : 'wagers'), total: true },
+    { label: 'Most games bet', ...mostGames },
+    { label: 'Underdog picks', ...percentageLeader(rows, 'underdogs', 'No underdog picks yet') },
+    { label: 'Most underdog wins', ...countLeader(rows, 'underdogWins') },
+    { label: 'Favorite picks', ...percentageLeader(rows, 'favorites', 'No favorite picks yet') },
+    { label: 'Most favorite wins', ...countLeader(rows, 'favoriteWins') },
+    { label: 'Home-team picks', ...percentageLeader(rows, 'home', 'No home-team picks yet') },
+    { label: 'Most home-team wins', ...countLeader(rows, 'homeWins') },
+    { label: 'Road-team picks', ...percentageLeader(rows, 'road', 'No road-team picks yet') },
+    { label: 'Most road-team wins', ...countLeader(rows, 'roadWins') },
+  ];
+  $('group-stats').innerHTML = cards.map(card => '<article class="stat-card' + (card.total ? ' stat-total' : '') + '">'
+    + '<span class="stat-label">' + text(card.label) + '</span>'
+    + '<strong class="stat-value">' + text(card.value) + '</strong>'
+    + (card.detail ? '<span class="stat-detail">' + text(card.detail) + '</span>' : '') + '</article>').join('');
+}
+
 function drawStatementChart() {
   const trend = board?.standings.find(row => row.name === player)?.trend;
   if (!trend?.length || !$('statement-trend').clientWidth) return;
@@ -344,7 +403,7 @@ if (statementView && typeof ResizeObserver === 'function') {
 function render({ force = false } = {}) {
   refreshStatus();
   if (!board) return;
-  const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs,
+  const signature = JSON.stringify([board.week, board.displayDay, board.history, board.games, board.pairs, board.groupStats,
     statementView || investView ? board.standings : null, saving]);
   if (!force && signature === lastRender) return;
   lastRender = signature;
@@ -360,6 +419,7 @@ function render({ force = false } = {}) {
   renderBalances();
   renderGames();
   renderSettlements();
+  renderGroupStats();
   if (statementView || investView) renderBalanceSummary();
   const rankedStandings = [...board.standings].sort((a, b) => b.settled - a.settled || a.name.localeCompare(b.name));
   $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th>'
