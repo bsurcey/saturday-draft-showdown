@@ -29,7 +29,7 @@
       document.documentElement.classList.add('invest-view');
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = '/invest.css?v=7';
+      stylesheet.href = '/invest.css?v=8';
       document.head.append(stylesheet);
     }
   </script>
@@ -135,7 +135,7 @@
     <section class="board-panel" aria-labelledby="settlement-heading">
       <div class="board-panel-heading">
         <h2 id="settlement-heading">Settle Up</h2>
-        <p>Based on completed games.</p>
+        <p><span class="settlement-source">Based on completed games.</span><span class="invest-settlement-note">Who would pay whom if we settled up today. Final scores only.</span></p>
       </div>
       <div id="settlements"></div>
     </section>
