@@ -109,6 +109,10 @@
 .invest-view .spread { color: var(--muted); }
 .invest-view .team.selected { background: #292e13; border-color: var(--bright); }
 .invest-view .team.selected .spread { color: var(--bright); }
+.invest-view .team.selected.pick-loss { background: #351713; border-color: var(--red); }
+.invest-view .team.selected.pick-loss .spread { color: var(--red); }
+.invest-view .team.selected.pick-push { background: #211c10; border-color: var(--muted); }
+.invest-view .team.selected.pick-push .spread { color: var(--muted); }
 .invest-view button.team:enabled:hover { border-color: var(--bright); }
 .invest-view .team-name { font-weight: 650; }
 .invest-view .clear { font-weight: 600; }

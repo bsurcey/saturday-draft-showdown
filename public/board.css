@@ -104,6 +104,10 @@ details[open] > summary .pair-title::before { transform: rotate(45deg); }
 }
 button.team:enabled:hover { border-color: #aa5209; }
 .team.selected { background: #fff1e2; border-color: #b85400; }
+.team.selected.pick-loss { background: #fff0ed; border-color: var(--red); }
+.team.selected.pick-loss .spread { color: var(--red); }
+.team.selected.pick-push { background: var(--white); border-color: var(--muted); }
+.team.selected.pick-push .spread { color: var(--muted); }
 .team-logo { width: 23px; height: 23px; object-fit: contain; }
 .team-name { font-weight: 700; }
 .team-name small { font-weight: 600; color: var(--muted); margin-right: 3px; }

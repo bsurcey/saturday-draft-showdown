@@ -136,14 +136,29 @@ function renderHistoryOptions() {
   }
 }
 
+function finalPickStatus(game, side, picked) {
+  if (picked !== side) return '';
+  if (game.state === 'void') return 'pick-push';
+  if (game.state !== 'final'
+    || ![game.home.score, game.away.score, game.homeLine].every(Number.isFinite)) return '';
+  const margin = game.home.score - game.away.score + game.homeLine;
+  if (margin === 0) return 'pick-push';
+  const winner = margin > 0 ? 'home' : 'away';
+  return winner === side ? 'pick-win' : 'pick-loss';
+}
+
 function renderTeam(game, side, editable, picked) {
   const team = game[side];
   const names = Object.entries(game.picks ?? {}).filter(([, pick]) => pick === side).map(([name]) => name);
   const spread = game.homeLine === null ? null : side === 'home' ? game.homeLine : -game.homeLine;
-  const classes = 'team' + (picked === side ? ' selected' : '');
+  const pickStatus = finalPickStatus(game, side, picked);
+  const classes = 'team' + (picked === side ? ' selected' : '') + (pickStatus ? ' ' + pickStatus : '');
+  const resultLabel = pickStatus ? '<span class="sr-only">Your pick '
+    + (pickStatus === 'pick-win' ? 'won' : pickStatus === 'pick-loss' ? 'lost' : 'pushed')
+    + ' against the spread.</span>' : '';
   const content = (team.logo ? '<img class="team-logo" src="' + text(team.logo) + '" alt="" loading="lazy">' : '<span></span>')
     + '<span class="team-name">' + (team.rank ? '<small>' + team.rank + '</small>' : '') + text(team.name)
-    + (names.length ? '<span class="side-players">' + names.map(text).join(', ') + '</span>' : '') + '</span>'
+    + resultLabel + (names.length ? '<span class="side-players">' + names.map(text).join(', ') + '</span>' : '') + '</span>'
     + '<span class="score">' + (['live', 'final'].includes(game.state) ? text(team.score ?? '') : '') + '</span>'
     + '<span class="spread">' + lineLabel(spread) + '</span>';
   if (!editable) return '<div class="' + classes + '">' + content + '</div>';
