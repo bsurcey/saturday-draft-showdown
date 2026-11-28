@@ -37,7 +37,7 @@
   height: auto;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--bright) url('/herb-header.png') center top 3% / auto 116% no-repeat;
+  background: var(--bright) url('/herb-header.png') center / auto 83% no-repeat;
 }
 .invest-view .brand-logo img { display: none; }
 .invest-view .header-status {
