@@ -351,8 +351,10 @@ function render({ force = false } = {}) {
   renderGames();
   renderSettlements();
   if (statementView || investView) renderBalanceSummary();
-  $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th><th scope="col">Owed net</th>'
-    + '<th scope="col">' + projectedBalanceLabel + '</th></tr></thead><tbody>' + board.standings.map(row => '<tr><th scope="row">'
+  const rankedStandings = [...board.standings].sort((a, b) => b.settled - a.settled || a.name.localeCompare(b.name));
+  $('ranks').innerHTML = '<table class="rank-table"><thead><tr><th scope="col">Player</th>'
+    + '<th scope="col" aria-sort="descending">Owed net</th>'
+    + '<th scope="col">' + projectedBalanceLabel + '</th></tr></thead><tbody>' + rankedStandings.map(row => '<tr><th scope="row">'
     + text(row.name) + '</th><td class="points ' + pointClass(row.settled) + '">' + signedMoney(row.settled)
     + '</td><td class="points ' + pointClass(row.live) + '">' + signedMoney(row.live) + '</td></tr>').join('')
     + '</tbody></table>';
