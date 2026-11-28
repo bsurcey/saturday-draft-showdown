@@ -163,11 +163,6 @@
 
 @media (max-width: 600px) {
   .invest-view .statement-value { font-size: clamp(3.75rem, 16vw, 4.5rem); }
-  .invest-view .matchups > .overview .segments {
-    background: transparent;
-    border: 0;
-    padding: 0;
-  }
   .invest-view .segments button { padding-inline: 8px; }
   .invest-view .team { min-height: 44px; }
 }

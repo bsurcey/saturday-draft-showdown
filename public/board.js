@@ -40,7 +40,6 @@ const pointClass = n => n > 0 ? 'positive' : n < 0 ? 'negative' : 'neutral';
 let board;
 let player;
 let activeScope = 'mine';
-let activeGameView = 'all';
 let activeLeague = 'all';
 let activeDay = 'auto';
 let updating;
@@ -208,36 +207,26 @@ function renderGame(game) {
 }
 
 function renderGames() {
-  const myGames = activeGameView === 'mine';
-  $('game-filters').hidden = myGames;
-  let matches;
-  if (myGames) {
-    matches = board.games.filter(game => opponentCount(game.picks, player) > 0);
-  } else {
-    const leagueGames = board.games.filter(game => belongsOnActiveBoard(game)
-      && (activeLeague === 'all' || game.league === activeLeague));
-    const days = [...new Set(leagueGames.map(localGameDay))].sort();
-    const displayDay = board.displayDay ?? board.today;
-    const automatic = activeDay === 'auto';
-    const defaultDay = days.includes(displayDay) ? displayDay : 'all';
-    const selectedDay = automatic ? defaultDay : activeDay;
-    if (!automatic && activeDay !== 'all' && !days.includes(activeDay)) {
-      days.push(activeDay);
-      days.sort();
-    }
-    const defaultLabel = defaultDay === 'all' ? 'All days' : formatDay(defaultDay);
-    dayInput.innerHTML = '<option value="auto">Auto · ' + defaultLabel + '</option>'
-      + '<option value="all">All days</option>' + days.map(day =>
-      '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
-    dayInput.value = activeDay;
-    matches = leagueGames.filter(game => selectedDay === 'all' || localGameDay(game) === selectedDay
-      || (automatic && game.state === 'live'));
+  const leagueGames = board.games.filter(game => belongsOnActiveBoard(game)
+    && (activeLeague === 'all' || game.league === activeLeague));
+  const days = [...new Set(leagueGames.map(localGameDay))].sort();
+  const displayDay = board.displayDay ?? board.today;
+  const automatic = activeDay === 'auto';
+  const selectedDay = automatic ? displayDay : activeDay;
+  if (!automatic && activeDay !== 'all' && !days.includes(activeDay)) {
+    days.push(activeDay);
+    days.sort();
   }
+  dayInput.innerHTML = '<option value="auto">Auto · ' + formatDay(displayDay) + '</option>'
+    + '<option value="all">All days</option>' + days.map(day =>
+    '<option value="' + day + '">' + formatDay(day) + '</option>').join('');
+  dayInput.value = activeDay;
+  const matches = leagueGames.filter(game => selectedDay === 'all' || localGameDay(game) === selectedDay
+    || (automatic && game.state === 'live' && localGameDay(game) < selectedDay));
   const groups = Map.groupBy(matches, localGameDay);
   $('games').innerHTML = [...groups].map(([day, games]) => '<h3 class="game-day-title">' + formatDay(day)
     + '</h3><div class="game-grid">' + games.map(renderGame).join('') + '</div>').join('')
-    || (myGames ? '<p class="empty">None of your picks have an opponent this week.</p>'
-      : '<p class="empty">No matchups on this board yet.</p>');
+    || '<p class="empty">No matchups on this board yet.</p>';
 }
 
 function settlementPlan(standings) {
@@ -601,7 +590,7 @@ dayInput.addEventListener('change', () => {
 document.addEventListener('click', event => {
   const button = event.target.closest('button');
   if (!button) return;
-  const { scope, league, gameView } = button.dataset;
+  const { scope, league } = button.dataset;
   if (scope) {
     activeScope = scope;
     setSegment('[data-scope]', 'scope', scope);
@@ -610,11 +599,6 @@ document.addEventListener('click', event => {
   if (league) {
     activeLeague = league;
     setSegment('[data-league]', 'league', league);
-    if (board) renderGames();
-  }
-  if (gameView) {
-    activeGameView = gameView;
-    setSegment('[data-game-view]', 'gameView', gameView);
     if (board) renderGames();
   }
 });

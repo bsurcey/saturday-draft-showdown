@@ -21,7 +21,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/app-icon-lime-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-lime.png">
   <link rel="manifest" href="/site.webmanifest?v=2">
-  <link rel="stylesheet" href="/board.css?v=22">
+  <link rel="stylesheet" href="/board.css?v=23">
   <link rel="stylesheet" href="/statement.css?v=1">
   <link rel="stylesheet" href="/gameday.css?v=1">
   <script>
@@ -34,11 +34,11 @@
       document.documentElement.classList.add('invest-view');
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = '/invest.css?v=15';
+      stylesheet.href = '/invest.css?v=17';
       document.head.append(stylesheet);
     }
   </script>
-  <script type="module" src="/board.js?v=21"></script>
+  <script type="module" src="/board.js?v=22"></script>
 </head>
 <body>
   <header class="masthead">
@@ -110,12 +110,8 @@
           <h2 id="matchups-heading">Pick your sides</h2>
           <p>$20 per opponent on the other side.</p>
         </div>
-        <div class="segments" role="group" aria-label="Game view">
-          <button type="button" data-game-view="all" aria-controls="games" aria-pressed="true">All Games</button>
-          <button type="button" data-game-view="mine" aria-controls="games" aria-pressed="false">My Games</button>
-        </div>
       </div>
-      <div class="filters" id="game-filters">
+      <div class="filters">
         <div class="segments sport-filter" role="group" aria-label="Sport">
           <button type="button" data-league="all" aria-label="All sports" aria-pressed="true"><span class="sport-full">All sports</span><span class="sport-short" aria-hidden="true">All</span></button>
           <button type="button" data-league="ncaaf" aria-label="College football" aria-pressed="false"><span class="sport-full">College football</span><span class="sport-short" aria-hidden="true">CFB</span></button>

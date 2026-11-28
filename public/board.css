@@ -152,12 +152,11 @@ footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10
   .brand-logo { width: 43px; height: 43px; }
   .week-selector span { display: none; }
   .overview { align-items: flex-end; gap: 6px; }
-  .matchups > .overview { align-items: stretch; flex-direction: column; gap: 12px; }
-  .matchups > .overview .segments, .panel-toolbar .segments {
+  .panel-toolbar .segments {
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px;
     width: 100%; padding: 3px; border: 1px solid var(--border); border-radius: 7px; background: var(--white);
   }
-  .matchups > .overview .segments button, .panel-toolbar .segments button { min-height: 40px; padding: 7px 10px; }
+  .panel-toolbar .segments button { min-height: 40px; padding: 7px 10px; }
   .balance-head, .balance-row { grid-template-columns: minmax(66px, .75fr) minmax(75px, 1fr) minmax(80px, 1fr); padding-inline: 8px; gap: 6px; font-size: .8rem; }
   .panel-toolbar { flex-direction: column; align-items: stretch; gap: 5px; padding: 8px; }
   .filters { align-items: flex-start; flex-wrap: wrap; }
