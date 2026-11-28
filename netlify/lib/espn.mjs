@@ -2,7 +2,7 @@ import { dayOf, shiftDay } from './ledger.mjs';
 
 export const leagues = {
   ncaaf: { path: 'football/college-football', group: 80, limit: 10 },
-  ncaam: { path: 'basketball/mens-college-basketball', group: 50, limit: 6 },
+  ncaam: { path: 'basketball/mens-college-basketball', group: 50, limit: Infinity },
   nfl: { path: 'football/nfl', limit: Infinity },
 };
 
