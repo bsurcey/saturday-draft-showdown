@@ -18,13 +18,39 @@
   background: #000;
   border-bottom: 1px solid #35322d;
 }
+.invest-view .header-inner {
+  display: grid;
+  grid-template-columns: clamp(48px, 13.8vw, 68px) minmax(0, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 6px 10px;
+  padding-block: 14px;
+}
+.invest-view .header-brand { display: contents; }
+.invest-view .header-brand > div { grid-area: 1 / 2; align-self: end; }
 .invest-view .brand {
   text-transform: none;
-  color: var(--bright);
-  font-weight: 700;
-  letter-spacing: 0;
+  color: var(--ink);
 }
-.invest-view .brand-logo { background: #fff; border-radius: 50%; }
+.invest-view .brand-logo {
+  grid-area: 1 / 1 / 3 / 2;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--bright) url('/herb-header.png') center / auto 83% no-repeat;
+}
+.invest-view .brand-logo img { display: none; }
+.invest-view .header-status {
+  grid-area: 2 / 2;
+  align-self: start;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  margin-left: 0;
+}
+.invest-view .identity::after { content: "·"; margin-left: 1px; color: inherit; }
 .invest-view .identity, .invest-view .refresh-label { color: var(--muted); }
 .invest-view .season-note, .invest-view .ledger-cutoff, .invest-view .settlement-source { display: none; }
 .invest-view .invest-settlement-note { display: inline; }
@@ -37,9 +63,11 @@
   padding-bottom: 20px;
   margin-bottom: 20px;
 }
-.invest-view #statement-title {
+.invest-view #statement-title,
+.invest-view .brand {
   font-size: 1rem;
   font-weight: 600;
+  line-height: 1.05;
   letter-spacing: 0;
 }
 .invest-view .statement-value {
