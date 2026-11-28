@@ -10,6 +10,7 @@ const followedTeams = {
   ncaam: {
     '2193': 'East Tennessee State',
     '236': 'Chattanooga',
+    '135': 'Minnesota',
   },
   ncaaf: {
     '2579': 'South Carolina',
